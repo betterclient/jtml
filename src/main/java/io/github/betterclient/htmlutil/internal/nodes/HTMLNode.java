@@ -1,6 +1,7 @@
 package io.github.betterclient.htmlutil.internal.nodes;
 
 import io.github.betterclient.htmlutil.api.event.MouseClickHandler;
+import io.github.betterclient.htmlutil.internal.ElementDimensions;
 import io.github.betterclient.htmlutil.internal.render.ElementRenderingContext;
 import io.github.betterclient.htmlutil.internal.css.CSSStyle;
 import org.jsoup.nodes.Node;
@@ -12,6 +13,14 @@ public abstract class HTMLNode<T extends Node> {
     public List<HTMLNode<? extends Node>> children = new ArrayList<>();
     public List<MouseClickHandler> mouseDown = new ArrayList<>();
     public List<MouseClickHandler> mouseUp = new ArrayList<>();
+
+    public boolean display$moveDown = false; //Used to indicate a "br" element, is in a field, so it's easy to use for other elements
+
+    public int x = 0;
+    public int y = 0;
+    //These width & height properties should be set by the display compiler to forcefully set widths and heights
+    public int width = 0;
+    public int height = 0;
 
     public final T instance;
     public final Node parent;
@@ -34,21 +43,43 @@ public abstract class HTMLNode<T extends Node> {
     }
 
     /**
-     * APINOTE: The method calling this is NOT responsible for rendering the children.
-     * <br>
+     * APINOTE: The method calling this is responsible for rendering the children.
      * APINOTE: The method calling this is responsible for background and positioning.
-     * <br>
-     * APINOTE: You should always call super.render() at the end of your custom implementation.
      * @param context rendering context
      */
-    public void render(ElementRenderingContext context) {
-        for (HTMLNode<? extends Node> child : this.children) {
-            context.drawBackground(child);
+    public void render(ElementRenderingContext context) {}
 
-            context.currentlyRendered = child;
-            context.startLogging(child);
-            child.render(context);
-            context.endLogging(child);
+    public ElementDimensions getDimensions(ElementRenderingContext context) {
+        int width = this.width, height = this.height;
+
+        for (HTMLNode<? extends Node> child : this.children) {
+            ElementDimensions dimensions = child.getDimensions(context);
+
+            if (width < (child.x + dimensions.width)) {
+                width = child.x + dimensions.width;
+            }
+
+            if (height < (child.y + dimensions.height)) {
+                height = child.y + dimensions.height;
+            }
         }
+
+        return new ElementDimensions(width, height);
+    }
+
+    public int getX() {
+        int x = this.x;
+
+        if (parent0 != null) x += parent0.getX();
+
+        return x;
+    }
+
+    public int getY() {
+        int y = this.y;
+
+        if (parent0 != null) y += parent0.getY();
+
+        return y;
     }
 }

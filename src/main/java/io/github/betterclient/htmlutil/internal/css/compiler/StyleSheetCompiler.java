@@ -1,7 +1,5 @@
 package io.github.betterclient.htmlutil.internal.css.compiler;
 
-import io.github.betterclient.htmlutil.internal.elements.HTMLDocument;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +21,7 @@ public class StyleSheetCompiler {
 
             if (line.endsWith("{")) {
                 currentSelector = line.substring(0, line.length() - 1).trim();
-                currentRule = new CompiledStyleSheet(currentSelector);
+                currentRule = new CompiledStyleSheet();
             } else if (line.equals("}")) {
                 if (currentRule != null) {
                     compilation.put(currentSelector, currentRule);

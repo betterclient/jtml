@@ -12,4 +12,10 @@ public record StyleParser(CSSStyle style) {
 
         return ColorParser.calculateColor(cValue).getRGB();
     }
+
+    public int getWidthOffset() {
+        String cValue = style.calculate("width-offset");
+
+        return Integer.parseInt(cValue.substring(0, cValue.length() - 2));
+    }
 }

@@ -4,10 +4,13 @@ import io.github.betterclient.htmlutil.api.DocumentScreenOptions;
 import io.github.betterclient.htmlutil.internal.nodes.HTMLNode;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -99,8 +102,26 @@ public class HTMLDocument extends HTMLElement<io.github.betterclient.htmlutil.in
     }
 
     /**
+     * Select elements using a CSS selector
+     * @param cssSelector selector
+     * @return elements that can be selected using the selector
+     */
+    public final List<HTMLElement<?>> select(String cssSelector) {
+        List<HTMLElement<?>> elements = new ArrayList<>();
+        Elements elements0 = this.internal.instance.select(cssSelector);
+        for (io.github.betterclient.htmlutil.internal.elements.HTMLElement htmlElement : this.internalToMapped.keySet()) {
+            if (elements0.contains(htmlElement.instance)) {
+                HTMLElement<?> element1 = this.internalToMapped.get(htmlElement);
+                elements.add(element1);
+            }
+        }
+
+        return elements;
+    }
+
+    /**
      * Open this HTMLDocument as a screen.
-     * This is the main function you'll use to open the screen you've created.
+     * This is the main function you'll use to open the document you've created.
      */
     public final void openAsScreen(DocumentScreenOptions options) {
         internal.openAsScreen(options);

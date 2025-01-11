@@ -5,3 +5,14 @@ span {
 #id_css_test {
     background-color: red;
 }
+
+.id_css_test {
+    background-color: red;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: end;
+}

@@ -1,9 +1,6 @@
 package io.github.betterclient.htmlutil.internal;
 
-import io.github.betterclient.htmlutil.internal.elements.HTMLBrElement;
-import io.github.betterclient.htmlutil.internal.elements.HTMLButtonElement;
-import io.github.betterclient.htmlutil.internal.elements.HTMLElement;
-import io.github.betterclient.htmlutil.internal.elements.HTMLSpanElement;
+import io.github.betterclient.htmlutil.internal.elements.*;
 import io.github.betterclient.htmlutil.internal.nodes.HTMLNode;
 import io.github.betterclient.htmlutil.internal.nodes.HTMLTextNode;
 import org.jsoup.nodes.Element;
@@ -31,6 +28,10 @@ public class ElementParser {
                     Map.entry(
                             "button",
                             pair -> new HTMLButtonElement(pair.left(), pair.right())
+                    ),
+                    Map.entry(
+                            "style",
+                            pair -> null //Handle later
                     )
             )
     );
@@ -49,12 +50,15 @@ public class ElementParser {
 
         for (Node child : element.instance.childNodes()) {
             if (child instanceof Element el) {
-                nodes.add(ELEMENT_MAP.getOrDefault(
+                HTMLElement htmlElement = ELEMENT_MAP.getOrDefault(
                         el.tagName(),
                         htmlElementElementPair -> {
                             throw new UnsupportedOperationException("Tag: " + el.tagName() + " not implemented");
                         }
-                ).apply(Pair.of(element, el)));
+                ).apply(Pair.of(element, el));
+                if (htmlElement == null) continue; //style elements will skip here
+
+                nodes.add(htmlElement);
             } else {
                 nodes.add(NODE_MAP.getOrDefault(
                         child.nodeName(),

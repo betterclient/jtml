@@ -21,7 +21,7 @@ public class CSSStyle {
                     ),
                     Map.entry(
                             "font-size",
-                            "16px"
+                            "9px"
                     ),
                     Map.entry(
                             "font-weight",
@@ -72,10 +72,29 @@ public class CSSStyle {
                     Map.entry(
                             "position",
                             "static"
+                    ),
+                    Map.entry(
+                            "width-offset",
+                            "2px"
+                    ),
+
+                    //-----FLEX-----
+                    Map.entry(
+                            "justify-content",
+                            "left"
+                    ),
+                    Map.entry(
+                            "flex-direction",
+                            "row"
+                    ),
+                    Map.entry(
+                            "align-items",
+                            "left"
                     )
             )
     );
 
+    //Default will inherit parent.
     public Map<String, String> MAP = new HashMap<>(
             Map.ofEntries(
                     //-----TEXT-----
@@ -139,10 +158,32 @@ public class CSSStyle {
                     //-----OTHER-----
                     Map.entry(
                             "display",
-                            "default"
+                            "inline" //Reset display for every element.
                     ),
                     Map.entry(
                             "position",
+                            "default"
+                    ),
+                    Map.entry(
+                            "width-offset",
+                            "default"
+                    ),
+
+                    //-----FLEX-----
+                    Map.entry(
+                            "justify-content",
+                            "default"
+                    ),
+                    Map.entry(
+                            "flex-direction",
+                            "default"
+                    ),
+                    Map.entry(
+                            "flex-wrap",
+                            "default"
+                    ),
+                    Map.entry(
+                            "align-items",
                             "default"
                     )
             )

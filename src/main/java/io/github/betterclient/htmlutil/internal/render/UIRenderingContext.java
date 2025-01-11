@@ -5,6 +5,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 public class UIRenderingContext {
+    public static final UIRenderingContext DEFAULT_FONT = new UIRenderingContext(null);
     private final TextRenderer renderer;
     public final DrawContext context;
 
@@ -36,5 +37,9 @@ public class UIRenderingContext {
         }
 
         return mouseX >= x & mouseX <= endX & mouseY >= y & mouseY <= endY;
+    }
+
+    public int width(String text) {
+        return this.renderer.getWidth(text);
     }
 }

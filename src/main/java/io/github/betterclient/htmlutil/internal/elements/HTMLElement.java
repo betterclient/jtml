@@ -11,6 +11,7 @@ import java.util.List;
 
 public abstract class HTMLElement extends HTMLNode<Element> {
     private List<Node> oldElements;
+    private HTMLDocument api;
 
     protected HTMLElement(HTMLNode<?> parent, Element instance) {
         super(parent, instance);
@@ -20,6 +21,7 @@ public abstract class HTMLElement extends HTMLNode<Element> {
     /**
      * SAFE RELOAD IMPLEMENTATION
      * DO NOT CHANGE YOU WILL BREAK EVERYTHING.
+     * I edited it ._.
      */
     public void reload() {
         if (oldElements == null) {
@@ -42,6 +44,16 @@ public abstract class HTMLElement extends HTMLNode<Element> {
             for (Node node : nodes) {
                 this.children.removeIf(htmlNode -> htmlNode.instance == node);
                 this.oldElements.remove(node);
+            }
+        }
+
+        HTMLNode<?> findDocument = this;
+        while (findDocument.parent0 != null) {
+            findDocument = findDocument.parent0;
+
+            if (findDocument instanceof io.github.betterclient.htmlutil.internal.elements.HTMLDocument document) {
+                document.reloadInlineCSS(findDocument); //Reload css
+                document.loadPositions(findDocument); //Reload elements for every change to the dom
             }
         }
     }

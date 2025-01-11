@@ -1,89 +1,59 @@
 package io.github.betterclient.htmlutil.internal.render;
 
+import io.github.betterclient.htmlutil.internal.ElementDimensions;
+import io.github.betterclient.htmlutil.internal.css.CSSStyle;
 import io.github.betterclient.htmlutil.internal.nodes.HTMLNode;
 import io.github.betterclient.htmlutil.internal.css.StyleParser;
-import it.unimi.dsi.fastutil.Pair;
-import it.unimi.dsi.fastutil.objects.ObjectObjectMutablePair;
-import org.joml.Vector4i;
-import org.jsoup.nodes.Node;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import net.minecraft.client.MinecraftClient;
 
 public class ElementRenderingContext {
-    public static Map<HTMLNode<?>, Vector4i> ELEMENT_BOUNDING_BOXES_MAP = new HashMap<>();
     public int x, y;
-    private final UIRenderingContext context;
+    public final UIRenderingContext context;
     public HTMLNode<?> currentlyRendered;
 
     public ElementRenderingContext(UIRenderingContext context) {
         this.context = context;
     }
 
-    public void drawBackground(HTMLNode<? extends Node> child) {
+    public void drawBackground(HTMLNode<?> child) {
         StyleParser parser = new StyleParser(child.style);
-        Vector4i box = ELEMENT_BOUNDING_BOXES_MAP.get(child);
-        if (box == null) {
-            if (child.parent == null) {
-                box = new Vector4i(0, 0, context.context.getScaledWindowWidth(), context.context.getScaledWindowHeight());
-            } else {
-                return;
-            }
-        }
+        ElementDimensions box = child.getDimensions(this);
 
-        context.context.fill(box.x, box.y, box.x + box.z, box.y + box.w, parser.getBackgroundColor());
+        context.context.fill(child.getX(), child.getY(), child.getX() + box.width, child.getY() + box.height, parser.getBackgroundColor());
+
+        //this current function - drawBackground, is called before rendering an element
+        //Which 100% guarantees child is going to be rendered right after this call
+        //so just set it here and remove the call requirements
+        //this will also make things simpler -betterclient
+        //This note just exists, so you don't touch this file, this is hell please save me.
+        this.currentlyRendered = child;
     }
 
     public void renderText(String text) {
         StyleParser parser = new StyleParser(this.currentlyRendered.style);
         //TODO: add sizing the text
 
-        int width = this.context.renderText(text, x, y, parser.getColor()) + 2;
+        int width = this.context.renderText(text, x, y, parser.getColor()) + parser.getWidthOffset();
         this.x += width;
-        //TODO: make this offset customizable (the +2)
-
-        logHeight(currentlyRendered, width, this.context.height());
     }
 
-    private void logHeight(HTMLNode<?> element, int x, int y) {
-        if (element.parent0 != null) {
-            logHeight(element.parent0, x, y);
-        }
+    public ElementDimensions asDimensions(CSSStyle style, String text) {
+        StyleParser parser = new StyleParser(style);
+        String s = style.calculate("font-size");
+        s = s.replace("px", "");
+        float i = Float.parseFloat(s);
 
-        if (HEIGHT_LOGGER.get(element) != null) {
-            Pair<AtomicInteger, Integer> pairH = HEIGHT_LOGGER.get(element);
-            Pair<AtomicInteger, Integer> pairW = WIDTH_LOGGER.get(element);
-
-            if (pairH.second() != this.y) {
-                pairH.second(this.y);
-                pairH.first().getAndAdd(y);
-            }
-
-            if (pairW.second() != this.x) {
-                pairW.second(this.x);
-                pairW.first().getAndAdd(x);
-            }
-        }
+        return new ElementDimensions(
+                (int) (i / 9) * context.width(text) + parser.getWidthOffset(),
+                ((int) i)
+        );
     }
 
-    //Width and height logger should store a pair of
-    //AtomicInteger - will be incremented for y/x increase
-    //Integer - will control whether the atomic is increased, it stores the last x/y value
-    Map<HTMLNode<?>, Pair<AtomicInteger, Integer>> HEIGHT_LOGGER = new HashMap<>();
-    Map<HTMLNode<?>, Pair<AtomicInteger, Integer>> WIDTH_LOGGER = new HashMap<>();
-
-    public void startLogging(HTMLNode<?> element) {
-        HEIGHT_LOGGER.put(element, new ObjectObjectMutablePair<>(new AtomicInteger(0), 0));
-        WIDTH_LOGGER.put(element, new ObjectObjectMutablePair<>(new AtomicInteger(0), 0));
+    public int screenWidth() {
+        return MinecraftClient.getInstance().getWindow().getScaledWidth();
     }
 
-    public void endLogging(HTMLNode<?> element) {
-        if (!WIDTH_LOGGER.containsKey(element)) return;
-
-        int width = WIDTH_LOGGER.remove(element).first().get();
-        int height = HEIGHT_LOGGER.remove(element).first().get();
-
-        ELEMENT_BOUNDING_BOXES_MAP.put(element, new Vector4i(x - width, y, width, height));
+    public int screenHeight() {
+        return MinecraftClient.getInstance().getWindow().getScaledHeight();
     }
 }

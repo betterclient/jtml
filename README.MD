@@ -57,3 +57,34 @@ This will get interpreted as:
 # Credits
 
 - jsoup: Library used for parsing HTML
+
+# Support
+
+Since this implementation is from scratch, support for some elements/properties is missing.
+
+### ❌ NO JAVASCRIPT. 
+HTMLUtil has an API for doing basically everything you can do with javascript, using java.
+
+- Supported Elements
+```
+<span>
+<br>
+<button>
+<body>
+```
+- Supported properties `* means anything that works in normal css`
+```
+display: inline | flex;
+background-color: *;
+color: *;
+justify-content: left | center | right;
+align-items: start | center | end;
+flex-direction: column | row;
+```
+- Custom properties to help with coding:
+```
+width-offset: 2px; (2px is default, this is the width offset of a text node)
+```
+
+# Other helpful things
+- You don't need the entire html document, just use the body is enough!

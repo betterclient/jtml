@@ -4,9 +4,11 @@ import io.github.betterclient.htmlutil.api.DocumentScreenOptions;
 import io.github.betterclient.htmlutil.internal.css.CSSStyle;
 import io.github.betterclient.htmlutil.internal.css.compiler.CompiledStyleSheet;
 import io.github.betterclient.htmlutil.internal.css.compiler.StyleSheetCompiler;
+import io.github.betterclient.htmlutil.internal.display.DisplayMode;
 import io.github.betterclient.htmlutil.internal.nodes.HTMLNode;
 import io.github.betterclient.htmlutil.internal.render.DocumentRenderer;
 import io.github.betterclient.htmlutil.internal.render.ElementRenderingContext;
+import io.github.betterclient.htmlutil.internal.render.UIRenderingContext;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
@@ -21,6 +23,7 @@ public class HTMLDocument extends HTMLElement {
 
     public HTMLDocument(String src) {
         super(null, Jsoup.parseBodyFragment(src).body());
+        this.loadStyleElements();
     }
 
     public void openAsScreen(DocumentScreenOptions options) {
@@ -36,18 +39,37 @@ public class HTMLDocument extends HTMLElement {
             for (String s : compilation.keySet()) {
                 for (Element element : instance.select(s)) {
                     for (Map.Entry<String, String> stringStringEntry : compilation.get(s).getProperties().entrySet()) {
-                        map.get(element).MAP.put(stringStringEntry.getKey(), stringStringEntry.getValue());
-                        //System.out.println("For " + s + " -> " + stringStringEntry.getKey() + "=" + stringStringEntry.getValue());
+                        //System.out.println("For " + s + " -> " + stringStringEntry.getKey() + "=" + stringStringEntry.getValue());v
+                        CSSStyle style = map.get(element);
+                        style.MAP.put(stringStringEntry.getKey(), stringStringEntry.getValue());
                     }
                 }
             }
         }
+
+        loadPositions(this);
+    }
+
+    public void loadPositions(HTMLNode<?> node) {
+        for (HTMLNode<? extends Node> child : node.children) {
+            loadPositions(child);
+        }
+
+        DisplayMode mode = DisplayMode.create(node.style);
+        mode.loadPositions(node, new ElementRenderingContext(UIRenderingContext.DEFAULT_FONT));
     }
 
     @Override
     public void render(ElementRenderingContext context) {
         //The document has no rendering.
         //The document stays invisible for transparency.
+    }
+    //TODO: add document.renderAsHud()
+
+    private void loadStyleElements() {
+        for (Element element : this.instance.select("style")) {
+            this.addStyleSheet(element.data());
+        }
     }
 
     public void addStyleSheet(String src) {
@@ -74,5 +96,18 @@ public class HTMLDocument extends HTMLElement {
     @Override
     public io.github.betterclient.htmlutil.api.elements.HTMLElement<?> toAPI(io.github.betterclient.htmlutil.api.elements.HTMLDocument document) {
         return null; //nuh uh
+    }
+
+    public void reloadInlineCSS(HTMLNode<?> findDocument) {
+        String[] list = findDocument.instance.attr("style").split("[:;]");
+        if (list.length != 0 && list.length != 1) {
+            for (int i = 0; i < list.length; i+=2) {
+                findDocument.style.MAP.put(list[i].trim(), list[i+1].trim());
+            }
+        }
+
+        for (HTMLNode<? extends Node> child : findDocument.children) {
+            reloadInlineCSS(child);
+        }
     }
 }
