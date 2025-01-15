@@ -1,8 +1,11 @@
 package io.github.betterclient.htmlutil.internal.css;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@RequiredArgsConstructor
 public class CSSStyle {
     public Map<String, String> DEFAULTS_MAP = new HashMap<>(
             Map.ofEntries(
@@ -10,10 +13,6 @@ public class CSSStyle {
                     Map.entry(
                             "color",
                             "white"
-                    ),
-                    Map.entry(
-                            "text-align",
-                            "start"
                     ),
                     Map.entry(
                             "text-decoration",
@@ -24,26 +23,18 @@ public class CSSStyle {
                             "9px"
                     ),
                     Map.entry(
-                            "font-weight",
-                            "normal"
+                            "text-align",
+                            "none"
                     ),
 
                     //-----BOX-----
                     Map.entry(
                             "width",
-                            "auto"
+                            "-1"
                     ),
                     Map.entry(
                             "height",
-                            "auto"
-                    ),
-                    Map.entry(
-                            "margin",
-                            "0"
-                    ),
-                    Map.entry(
-                            "padding",
-                            "0"
+                            "-1"
                     ),
                     Map.entry(
                             "border",
@@ -55,23 +46,11 @@ public class CSSStyle {
                             "background-color",
                             "transparent"
                     ),
-                    Map.entry(
-                            "background-image",
-                            "none"
-                    ),
-                    Map.entry(
-                            "background-repeat",
-                            "repeat"
-                    ),
 
                     //-----OTHER-----
                     Map.entry(
                             "display",
                             "inline"
-                    ),
-                    Map.entry(
-                            "position",
-                            "static"
                     ),
                     Map.entry(
                             "width-offset",
@@ -90,6 +69,69 @@ public class CSSStyle {
                     Map.entry(
                             "align-items",
                             "left"
+                    ),
+
+                    //-----GRID-----
+                    Map.entry(
+                            "grid-template-columns",
+                            "none"
+                    ),
+                    Map.entry(
+                            "grid-template-rows",
+                            "none"
+                    ),
+                    Map.entry(
+                            "grid-column",
+                            "auto"
+                    ),
+                    Map.entry(
+                            "grid-row",
+                            "auto"
+                    ),
+
+
+                    //-----MARGIN-----
+                    Map.entry(
+                            "margin",
+                            "0"
+                    ),
+                    Map.entry(
+                            "margin-top",
+                            "0"
+                    ),
+                    Map.entry(
+                            "margin-bottom",
+                            "0"
+                    ),
+                    Map.entry(
+                            "margin-left",
+                            "0"
+                    ),
+                    Map.entry(
+                            "margin-right",
+                            "0"
+                    ),
+
+                    //-----PADDING-----
+                    Map.entry(
+                            "padding",
+                            "0"
+                    ),
+                    Map.entry(
+                            "padding-top",
+                            "0"
+                    ),
+                    Map.entry(
+                            "padding-bottom",
+                            "0"
+                    ),
+                    Map.entry(
+                            "padding-left",
+                            "0"
+                    ),
+                    Map.entry(
+                            "padding-right",
+                            "0"
                     )
             )
     );
@@ -103,66 +145,42 @@ public class CSSStyle {
                             "default"
                     ),
                     Map.entry(
-                            "text-align",
-                            "default"
-                    ),
-                    Map.entry(
                             "text-decoration",
-                            "default"
+                            "none"
                     ),
                     Map.entry(
                             "font-size",
                             "default"
                     ),
                     Map.entry(
-                            "font-weight",
-                            "default"
+                            "text-align",
+                            "none"
                     ),
 
                     //-----BOX-----
                     Map.entry(
                             "width",
-                            "default"
+                            "-1"
                     ),
                     Map.entry(
                             "height",
-                            "default"
-                    ),
-                    Map.entry(
-                            "margin",
-                            "default"
-                    ),
-                    Map.entry(
-                            "padding",
-                            "default"
+                            "-1"
                     ),
                     Map.entry(
                             "border",
-                            "default"
+                            "none"
                     ),
 
                     //-----BACKGROUND-----
                     Map.entry(
                             "background-color",
-                            "default"
-                    ),
-                    Map.entry(
-                            "background-image",
-                            "default"
-                    ),
-                    Map.entry(
-                            "background-repeat",
-                            "default"
+                            "transparent"
                     ),
 
                     //-----OTHER-----
                     Map.entry(
                             "display",
-                            "inline" //Reset display for every element.
-                    ),
-                    Map.entry(
-                            "position",
-                            "default"
+                            "inline"
                     ),
                     Map.entry(
                             "width-offset",
@@ -172,28 +190,82 @@ public class CSSStyle {
                     //-----FLEX-----
                     Map.entry(
                             "justify-content",
-                            "default"
+                            "left"
                     ),
                     Map.entry(
                             "flex-direction",
-                            "default"
-                    ),
-                    Map.entry(
-                            "flex-wrap",
-                            "default"
+                            "row"
                     ),
                     Map.entry(
                             "align-items",
-                            "default"
+                            "left"
+                    ),
+
+                    //-----GRID-----
+                    Map.entry(
+                            "grid-template-columns",
+                            "none"
+                    ),
+                    Map.entry(
+                            "grid-template-rows",
+                            "none"
+                    ),
+                    Map.entry(
+                            "grid-column",
+                            "auto"
+                    ),
+                    Map.entry(
+                            "grid-row",
+                            "auto"
+                    ),
+
+                    //-----MARGIN-----
+                    Map.entry(
+                            "margin",
+                            "0"
+                    ),
+                    Map.entry(
+                            "margin-top",
+                            "0"
+                    ),
+                    Map.entry(
+                            "margin-bottom",
+                            "0"
+                    ),
+                    Map.entry(
+                            "margin-left",
+                            "0"
+                    ),
+                    Map.entry(
+                            "margin-right",
+                            "0"
+                    ),
+
+                    //-----PADDING-----
+                    Map.entry(
+                            "padding",
+                            "0"
+                    ),
+                    Map.entry(
+                            "padding-top",
+                            "0"
+                    ),
+                    Map.entry(
+                            "padding-bottom",
+                            "0"
+                    ),
+                    Map.entry(
+                            "padding-left",
+                            "0"
+                    ),
+                    Map.entry(
+                            "padding-right",
+                            "0"
                     )
             )
     );
 
-    public CSSStyle parent;
-
-    public CSSStyle(CSSStyle parent) {
-        this.parent = parent;
-    }
+    public final CSSStyle parent;
 
     public String calculate(String name) {
         CSSStyle style = this;
@@ -202,7 +274,7 @@ public class CSSStyle {
             style = style.parent;
         }
         String out = style == null ? this.DEFAULTS_MAP.get(name) : style.MAP.get(name);
-        if (out.equals("auto")) out = "-1";
+        if (out == null) out = this.DEFAULTS_MAP.get(name);
 
         return out;
     }

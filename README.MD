@@ -4,7 +4,9 @@ Create stunning interfaces for minecraft with HTML.
 
 # Usage
 
-- Before we start: This is still a **WIP** library, you might have to do **drastic** changes to your codebase. This is an implementation of HTML Rendering and things may not be 100% accurate to browser rendering.  
+- Before we start: This is still a **WIP** library, you might have to do **MASSIVE** changes to your codebase. This is an implementation of HTML Rendering and things may not be 100% accurate to browser rendering.  
+
+[//]: <> (You know what else is massive?) 
 
 ##### Steps: 
 - Create a new source file. (java/kotlin/groovy/whatever)
@@ -53,7 +55,6 @@ This will get interpreted as:
 ```
 *Note: This won't work on translations with parameters*
 
-
 # Credits
 
 - jsoup: Library used for parsing HTML
@@ -66,20 +67,39 @@ Since this implementation is from scratch, support for some elements/properties 
 HTMLUtil has an API for doing basically everything you can do with javascript, using java.
 
 - Supported Elements
-```
+```html
 <span>
 <br>
 <button>
 <body>
 ```
 - Supported properties `* means anything that works in normal css`
-```
-display: inline | flex;
+```css
+display: inline | flex | grid;
 background-color: *;
 color: *;
+text-decoration: strikethrough | underline | none;
+
 justify-content: left | center | right;
 align-items: start | center | end;
 flex-direction: column | row;
+
+grid-template-columns: *;
+grid-template-rows: *;
+grid-column: *;
+grid-row: *;
+
+margin: *;
+margin-top: *;
+margin-bottom: *;
+margin-left: *;
+margin-right: *;
+
+padding: *;
+padding-top: *;
+padding-bottom: *;
+padding-left: *;
+padding-right: *;
 ```
 - Custom properties to help with coding:
 ```
@@ -87,4 +107,4 @@ width-offset: 2px; (2px is default, this is the width offset of a text node)
 ```
 
 # Other helpful things
-- You don't need the entire html document, just use the body is enough!
+- You don't need the entire html document, just the body is enough!

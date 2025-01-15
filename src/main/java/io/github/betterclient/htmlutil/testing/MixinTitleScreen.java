@@ -1,10 +1,7 @@
 package io.github.betterclient.htmlutil.testing;
 
 import io.github.betterclient.htmlutil.api.DocumentScreenOptions;
-import io.github.betterclient.htmlutil.api.elements.HTMLBrElement;
-import io.github.betterclient.htmlutil.api.elements.HTMLButtonElement;
 import io.github.betterclient.htmlutil.api.elements.HTMLDocument;
-import io.github.betterclient.htmlutil.api.elements.HTMLSpanElement;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -23,33 +20,27 @@ public class MixinTitleScreen extends Screen {
 
     @Inject(method = "init", at = @At("RETURN"))
     public void init(CallbackInfo ci) {
-        this.addDrawableChild(ButtonWidget.builder(Text.literal("Test HTML"), (button) -> {
-            start();
-        }).dimensions(this.width / 2 + 150, this.height / 4 + 48, 98, 20).build());
+        this.addDrawableChild(ButtonWidget
+                .builder(Text.literal("Test HTML"), (button) -> start(0))
+                .dimensions(this.width / 2 + 150, this.height / 4 + 48, 98, 20)
+                .build()
+        );
     }
 
     @Unique
-    private void start() {
-        HTMLDocument document = new HTMLDocument("/testing.html");
-        document.addStyleSheet("/testing.css");
+    private void start(int c) {
+        long start = System.currentTimeMillis();
+        HTMLDocument doc = switch (c) {
+            case 0 -> new HTMLDocument("/testing/1.html");
+            case 1 -> new HTMLDocument("/testing/2.html");
+            case 2 -> new HTMLDocument("/testing/3.html");
+            default -> throw new RuntimeException("a");
+        };
+        doc.getElementById("hd").onMouseUp(event -> start(0));
+        doc.getElementById("cl").onMouseUp(event -> start(1));
+        doc.getElementById("ot").onMouseUp(event -> start(2));
 
-        HTMLBrElement br = new HTMLBrElement(document);
-        document.appendElement(br);
-
-        HTMLSpanElement element = new HTMLSpanElement(document, "Appended element");
-        element.getStyle().put("color", "green");
-        element.getStyle().put("background-color", "blue");
-        document.appendElement(element);
-
-        HTMLButtonElement button = document.getElementById("mybutton");
-        button.onMouseUp((event) -> {
-            HTMLSpanElement element1 = document.getElementById("clickcounter");
-
-            element1.setText(
-                    (Integer.parseInt(element1.getText()) + 1) + ""
-            );
-        });
-
-        document.openAsScreen(new DocumentScreenOptions(true, true));
+        doc.openAsScreen(new DocumentScreenOptions(true, true));
+        System.out.println("Document took " + (System.currentTimeMillis() - start) + "milliseconds to open");
     }
 }

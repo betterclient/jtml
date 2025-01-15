@@ -2,13 +2,14 @@ package io.github.betterclient.htmlutil.api.elements;
 
 import io.github.betterclient.htmlutil.api.ElementStyle;
 import io.github.betterclient.htmlutil.api.event.MouseClickHandler;
+import lombok.Getter;
 
 import java.util.Objects;
 import java.util.function.Supplier;
 
 public class HTMLElement<T extends io.github.betterclient.htmlutil.internal.elements.HTMLElement> {
-    protected final T internal;
-    protected final ElementStyle style;
+    @Getter protected final T internal;
+    @Getter protected final ElementStyle style;
     protected final HTMLDocument document;
 
     public HTMLElement(HTMLDocument document, Supplier<T> internal) {
@@ -34,14 +35,6 @@ public class HTMLElement<T extends io.github.betterclient.htmlutil.internal.elem
     public final void setID(String id) {
         internal.instance.id(id);
         document.internal.reload();
-    }
-
-    T getInternal() {
-        return internal;
-    }
-
-    public final ElementStyle getStyle() {
-        return style;
     }
 
     /**

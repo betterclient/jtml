@@ -1,0 +1,44 @@
+<body>
+<div class="container">
+    <div class="left-table">
+        <div class="cell number" id="hd">Headers</div>
+        <div class="cell number" id="cl">Clickers</div>
+        <div class="cell number" id="ot">Other</div>
+    </div>
+    <div class="right-content">
+        <span>Span</span>
+        <br>
+        <span>Span2</span>
+    </div>
+</div>
+</body>
+
+<style>
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  display: flex;
+  border: 2px solid maroon;
+  background-color: #333;
+}
+
+.cell {
+  border: 1px solid maroon;
+  padding: 10px;
+}
+
+.cell.number {
+  width: 50px;
+  text-align: center;
+}
+
+.right-content {
+  flex: 1;
+  padding: 20px;
+  color: maroon;
+}
+</style>

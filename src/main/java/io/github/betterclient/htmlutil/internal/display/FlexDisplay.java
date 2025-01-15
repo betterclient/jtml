@@ -1,30 +1,34 @@
 package io.github.betterclient.htmlutil.internal.display;
+
 import io.github.betterclient.htmlutil.internal.ElementDimensions;
 import io.github.betterclient.htmlutil.internal.nodes.HTMLNode;
 import io.github.betterclient.htmlutil.internal.render.ElementRenderingContext;
 import org.jsoup.nodes.Node;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FlexDisplay extends DisplayMode {
+    static final DisplayMode INSTANCE = new FlexDisplay();
+
     public FlexDisplay() {
         super("flex");
     }
 
     @Override
     public void loadPositions(HTMLNode<?> node, ElementRenderingContext context) {
-        if (node.children.isEmpty()) {
+        List<HTMLNode<? extends Node>> children = new ArrayList<>(node.children);
+        if (children.isEmpty()) {
             //Children-less elements are what I like to call... actually I don't call them anything
             return;
         }
 
         boolean row = node.style.calculate("flex-direction").equals("row");
 
-        node.x = 5;
-        node.y = 5;
-
         int currentX = 0;
         int currentY = 0;
         //Column/Row handler
-        for (HTMLNode<? extends Node> child : node.children) {
+        for (HTMLNode<? extends Node> child : children) {
             ElementDimensions dimensions = child.getDimensions(context);
 
             if (child.display$moveDown) {
@@ -33,9 +37,9 @@ public class FlexDisplay extends DisplayMode {
                 continue;
             } else {
                 if (row) {
-                    if (node.children.indexOf(child) != 0) {
+                    if (children.indexOf(child) != 0) {
                         //Revert above currentY+= after moveDown
-                        HTMLNode<? extends Node> before = node.children.get(node.children.indexOf(child) - 1);
+                        HTMLNode<? extends Node> before = children.get(children.indexOf(child) - 1);
                         if (!before.display$moveDown) {
                             currentY = 0;
                         }
@@ -53,21 +57,21 @@ public class FlexDisplay extends DisplayMode {
         //justify-content, only works for row I think
         String justify_content = node.style.calculate("justify-content");
 
-        //Precalculated/css or screen sizes
-        int screenWidth = node.width <= 0 ? context.screenWidth() : node.width;
-        int screenHeight = node.height <= 0 ? context.screenHeight() : node.height;
+        //Precalculated/css or parent sizes
+        int screenWidth = node.width > 0 ? node.width : context.screenWidth();
+        int screenHeight = node.height > 0 ? node.height : context.screenHeight();
 
         if (justify_content.equals("center") && row) {
             currentX = (screenWidth - currentX) / 2;
 
-            for (HTMLNode<? extends Node> child : node.children) {
+            for (HTMLNode<? extends Node> child : children) {
                 child.x = currentX;
                 currentX += child.getDimensions(context).width;
             }
         } else if (justify_content.equals("right") && row) {
             currentX = screenWidth - currentX - 2; //...
 
-            for (HTMLNode<? extends Node> child : node.children) {
+            for (HTMLNode<? extends Node> child : children) {
                 child.x = currentX;
                 currentX += child.getDimensions(context).width;
             }
@@ -77,7 +81,7 @@ public class FlexDisplay extends DisplayMode {
         String align_items = node.style.calculate("align-items");
         if (row) {
             currentY = 0;
-            for (HTMLNode<? extends Node> child : node.children) {
+            for (HTMLNode<? extends Node> child : children) {
                 ElementDimensions dimensions = child.getDimensions(context);
 
                 if (child.display$moveDown) {
@@ -85,9 +89,9 @@ public class FlexDisplay extends DisplayMode {
 
                     continue;
                 } else {
-                    if (node.children.indexOf(child) != 0) {
+                    if (children.indexOf(child) != 0) {
                         //Revert above currentY+= after moveDown
-                        HTMLNode<? extends Node> before = node.children.get(node.children.indexOf(child) - 1);
+                        HTMLNode<? extends Node> before = children.get(children.indexOf(child) - 1);
                         if (!before.display$moveDown) {
                             currentY = 0;
                         }
@@ -107,7 +111,7 @@ public class FlexDisplay extends DisplayMode {
 
             }
         } else {
-            for (HTMLNode<? extends Node> child : node.children) {
+            for (HTMLNode<? extends Node> child : children) {
                 ElementDimensions dimensions = child.getDimensions(context);
 
                 switch (align_items) {
@@ -124,6 +128,11 @@ public class FlexDisplay extends DisplayMode {
                         break;
                 }
             }
+        }
+
+        for (HTMLNode<? extends Node> child : children) {
+            child.x -= node.x;
+            child.y -= node.y;
         }
     }
 }

@@ -18,11 +18,6 @@ public class HTMLBrElement extends HTMLElement {
     }
 
     @Override
-    public void render(ElementRenderingContext context) {
-        context.y += 9;
-    }
-
-    @Override
     public ElementDimensions getDimensions(ElementRenderingContext context) {
         return new ElementDimensions(0, 9);
     }

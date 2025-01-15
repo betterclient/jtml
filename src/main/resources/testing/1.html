@@ -1,0 +1,47 @@
+<body>
+<div class="container">
+    <div class="left-table">
+        <div class="cell number" id="hd">Headers</div>
+        <div class="cell number" id="cl">Clickers</div>
+        <div class="cell number" id="ot">Other</div>
+    </div>
+    <div class="right-content">
+        <h1>Header1</h1>
+        <h2>Header2</h2>
+        <h3>Header3</h3>
+        <h4>Header4</h4>
+        <h5>Header5</h5>
+        <h6>Header6</h6>
+    </div>
+</div>
+</body>
+
+<style>
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  display: flex;
+  border: 2px solid maroon;
+  background-color: #333;
+}
+
+.cell {
+  border: 1px solid maroon;
+  padding: 10px;
+}
+
+.cell.number {
+  width: 50px;
+  text-align: center;
+}
+
+.right-content {
+  flex: 1;
+  padding: 20px;
+  color: maroon;
+}
+</style>

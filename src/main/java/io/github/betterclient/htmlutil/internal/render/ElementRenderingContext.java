@@ -1,7 +1,8 @@
 package io.github.betterclient.htmlutil.internal.render;
 
 import io.github.betterclient.htmlutil.internal.ElementDimensions;
-import io.github.betterclient.htmlutil.internal.css.CSSStyle;
+import io.github.betterclient.htmlutil.internal.css.styles.Border;
+import io.github.betterclient.htmlutil.internal.css.styles.TextDecoration;
 import io.github.betterclient.htmlutil.internal.nodes.HTMLNode;
 import io.github.betterclient.htmlutil.internal.css.StyleParser;
 import net.minecraft.client.MinecraftClient;
@@ -16,10 +17,12 @@ public class ElementRenderingContext {
     }
 
     public void drawBackground(HTMLNode<?> child) {
-        StyleParser parser = new StyleParser(child.style);
         ElementDimensions box = child.getDimensions(this);
 
-        context.context.fill(child.getX(), child.getY(), child.getX() + box.width, child.getY() + box.height, parser.getBackgroundColor());
+        context.fill(child.getX(), child.getY(), child.getX() + box.width, child.getY() + box.height, child.parser.getBackgroundColor());
+
+        Border border = Border.parseBorderElement(child.style);
+        border.render(context, child.getX(), child.getY(), box.width, box.height);
 
         //this current function - drawBackground, is called before rendering an element
         //Which 100% guarantees child is going to be rendered right after this call
@@ -30,22 +33,17 @@ public class ElementRenderingContext {
     }
 
     public void renderText(String text) {
-        StyleParser parser = new StyleParser(this.currentlyRendered.style);
-        //TODO: add sizing the text
-
-        int width = this.context.renderText(text, x, y, parser.getColor()) + parser.getWidthOffset();
+        StyleParser parser = this.currentlyRendered.parser;
+        int width = this.context.renderText(text, x, y, parser.getColor(), parser.getSize("font-size"), TextDecoration.parse(this.currentlyRendered.style)) + parser.getWidthOffset();
         this.x += width;
     }
 
-    public ElementDimensions asDimensions(CSSStyle style, String text) {
-        StyleParser parser = new StyleParser(style);
-        String s = style.calculate("font-size");
-        s = s.replace("px", "");
-        float i = Float.parseFloat(s);
+    public ElementDimensions asDimensions(StyleParser parser, String text) {
+        float fontSize = parser.getSize("font-size");
 
         return new ElementDimensions(
-                (int) (i / 9) * context.width(text) + parser.getWidthOffset(),
-                ((int) i)
+                Math.round(fontSize / 9f) * context.width(text) + parser.getWidthOffset(),
+                Math.round(fontSize) + parser.getWidthOffset()
         );
     }
 

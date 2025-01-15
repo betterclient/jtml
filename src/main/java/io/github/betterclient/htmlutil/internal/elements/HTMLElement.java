@@ -9,13 +9,11 @@ import org.jsoup.nodes.Node;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class HTMLElement extends HTMLNode<Element> {
+public abstract class HTMLElement extends HTMLNode<@org.jetbrains.annotations.NotNull Element> {
     private List<Node> oldElements;
-    private HTMLDocument api;
 
     protected HTMLElement(HTMLNode<?> parent, Element instance) {
         super(parent, instance);
-        reload();
     }
 
     /**
@@ -23,6 +21,7 @@ public abstract class HTMLElement extends HTMLNode<Element> {
      * DO NOT CHANGE YOU WILL BREAK EVERYTHING.
      * I edited it ._.
      */
+    @Override
     public void reload() {
         if (oldElements == null) {
             this.children.addAll(ElementParser.parse(this));
@@ -50,11 +49,11 @@ public abstract class HTMLElement extends HTMLNode<Element> {
         HTMLNode<?> findDocument = this;
         while (findDocument.parent0 != null) {
             findDocument = findDocument.parent0;
+        }
 
-            if (findDocument instanceof io.github.betterclient.htmlutil.internal.elements.HTMLDocument document) {
-                document.reloadInlineCSS(findDocument); //Reload css
-                document.loadPositions(findDocument); //Reload elements for every change to the dom
-            }
+        if (findDocument instanceof io.github.betterclient.htmlutil.internal.elements.HTMLDocument document) {
+            document.reloadInlineCSS(findDocument); //Reload css
+            document.loadPositions(findDocument); //Reload elements for every change to the dom
         }
     }
 

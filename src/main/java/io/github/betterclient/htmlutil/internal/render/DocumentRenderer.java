@@ -23,7 +23,21 @@ public class DocumentRenderer extends Screen {
 
     @Override
     protected void init() {
+        recursiveReset(document);
+
         this.document.loadPositions(document);
+        this.document.reloadPositions(document);
+    }
+
+    private void recursiveReset(HTMLNode<?> e) {
+        for (HTMLNode<? extends Node> child : e.children) {
+            recursiveReset(child);
+        }
+
+        e.x = 0;
+        e.y = 0;
+        e.width = -1;
+        e.height = -1;
     }
 
     @Override
@@ -73,7 +87,7 @@ public class DocumentRenderer extends Screen {
         }
 
         if (UIRenderingContext.basicCollisionCheck(event.mouseX(), event.mouseY(), element.getX(), element.getY(), element.getX() + box.width, element.getY() + box.height)) {
-            element.mouseDown.forEach(mouseClickHandler -> mouseClickHandler.click(event));
+            element.mouseDown(event);
 
             return element instanceof HTMLElement; //Normal nodes - shouldn't be included
             //I don't even now why I made them have mouse-up-down events :pray:
@@ -98,7 +112,7 @@ public class DocumentRenderer extends Screen {
         }
 
         if (UIRenderingContext.basicCollisionCheck(event.mouseX(), event.mouseY(), element.getX(), element.getY(), element.getX() + box.width, element.getY() + box.height)) {
-            element.mouseUp.forEach(mouseClickHandler -> mouseClickHandler.click(event));
+            element.mouseUp(event);
 
             return element instanceof HTMLElement; //Normal nodes - shouldn't be included
             //I don't even now why I made them have mouse-up-down events :pray:

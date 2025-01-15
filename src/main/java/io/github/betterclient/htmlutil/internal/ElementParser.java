@@ -3,6 +3,7 @@ package io.github.betterclient.htmlutil.internal;
 import io.github.betterclient.htmlutil.internal.elements.*;
 import io.github.betterclient.htmlutil.internal.nodes.HTMLNode;
 import io.github.betterclient.htmlutil.internal.nodes.HTMLTextNode;
+import joptsimple.internal.Strings;
 import org.jsoup.nodes.Element;
 import it.unimi.dsi.fastutil.Pair;
 import org.jsoup.nodes.Node;
@@ -30,6 +31,37 @@ public class ElementParser {
                             pair -> new HTMLButtonElement(pair.left(), pair.right())
                     ),
                     Map.entry(
+                            "div",
+                            pair -> new HTMLDivElement(pair.left(), pair.right())
+                    ),
+
+                    //-----HEADERS-----
+                    Map.entry(
+                            "h1",
+                            pair -> new HTMLHeaderElement(pair.left(), pair.right())
+                    ),
+                    Map.entry(
+                            "h2",
+                            pair -> new HTMLHeaderElement(pair.left(), pair.right())
+                    ),
+                    Map.entry(
+                            "h3",
+                            pair -> new HTMLHeaderElement(pair.left(), pair.right())
+                    ),
+                    Map.entry(
+                            "h4",
+                            pair -> new HTMLHeaderElement(pair.left(), pair.right())
+                    ),
+                    Map.entry(
+                            "h5",
+                            pair -> new HTMLHeaderElement(pair.left(), pair.right())
+                    ),
+                    Map.entry(
+                            "h6",
+                            pair -> new HTMLHeaderElement(pair.left(), pair.right())
+                    ),
+
+                    Map.entry(
                             "style",
                             pair -> null //Handle later
                     )
@@ -47,29 +79,38 @@ public class ElementParser {
 
     public static List<HTMLNode<?>> parse(HTMLElement element) {
         List<HTMLNode<?>> nodes = new ArrayList<>();
+        List<String> notImplementedNodes = new ArrayList<>();
 
         for (Node child : element.instance.childNodes()) {
             if (child instanceof Element el) {
                 HTMLElement htmlElement = ELEMENT_MAP.getOrDefault(
                         el.tagName(),
                         htmlElementElementPair -> {
-                            throw new UnsupportedOperationException("Tag: " + el.tagName() + " not implemented");
+                            notImplementedNodes.add("Tag: " + el.tagName());
+                            return null;
                         }
                 ).apply(Pair.of(element, el));
                 if (htmlElement == null) continue; //style elements will skip here
 
                 nodes.add(htmlElement);
             } else {
-                nodes.add(NODE_MAP.getOrDefault(
+                HTMLNode<?> htmlNode = NODE_MAP.getOrDefault(
                         child.nodeName(),
                         htmlElementNodePair -> {
-                            throw new UnsupportedOperationException("Node: " + child.nodeName() + " not implemented");
+                            notImplementedNodes.add("Node: " + child.nodeName());
+                            return null;
                         }
-                ).apply(Pair.of(element, child)));
+                ).apply(Pair.of(element, child));
+
+                if (htmlNode == null) continue; //errors will skip here
+                nodes.add(htmlNode);
             }
         }
 
-        return nodes;
+        if (notImplementedNodes.isEmpty()) return nodes;
+
+        String out = Strings.join(notImplementedNodes, "\n").concat("\nNot implemented.");
+        throw new UnsupportedOperationException(out);
     }
 
     public static HTMLNode<?> parseSingle(HTMLElement parent, Node node) {

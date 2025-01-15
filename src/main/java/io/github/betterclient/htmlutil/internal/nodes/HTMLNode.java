@@ -1,7 +1,9 @@
 package io.github.betterclient.htmlutil.internal.nodes;
 
+import io.github.betterclient.htmlutil.api.event.MouseClickEvent;
 import io.github.betterclient.htmlutil.api.event.MouseClickHandler;
 import io.github.betterclient.htmlutil.internal.ElementDimensions;
+import io.github.betterclient.htmlutil.internal.css.StyleParser;
 import io.github.betterclient.htmlutil.internal.render.ElementRenderingContext;
 import io.github.betterclient.htmlutil.internal.css.CSSStyle;
 import org.jsoup.nodes.Node;
@@ -27,6 +29,7 @@ public abstract class HTMLNode<T extends Node> {
     public final HTMLNode<? extends Node> parent0;
 
     public final CSSStyle style;
+    public final StyleParser parser;
 
     protected HTMLNode(HTMLNode<? extends Node> parent, T instance) {
         this.instance = instance;
@@ -40,6 +43,9 @@ public abstract class HTMLNode<T extends Node> {
             this.parent = null;
             this.style = new CSSStyle(null);
         }
+        this.parser = new StyleParser(style);
+
+        reload();
     }
 
     /**
@@ -55,11 +61,11 @@ public abstract class HTMLNode<T extends Node> {
         for (HTMLNode<? extends Node> child : this.children) {
             ElementDimensions dimensions = child.getDimensions(context);
 
-            if (width < (child.x + dimensions.width)) {
+            if (width < (child.x + dimensions.width) && this.width <= 0) {
                 width = child.x + dimensions.width;
             }
 
-            if (height < (child.y + dimensions.height)) {
+            if (height < (child.y + dimensions.height) && this.height <= 0) {
                 height = child.y + dimensions.height;
             }
         }
@@ -75,11 +81,21 @@ public abstract class HTMLNode<T extends Node> {
         return x;
     }
 
+    public void reload() {}
+
     public int getY() {
         int y = this.y;
 
         if (parent0 != null) y += parent0.getY();
 
         return y;
+    }
+
+    public void mouseDown(MouseClickEvent event) {
+        this.mouseDown.forEach(mouseClickHandler -> mouseClickHandler.click(event));
+    }
+
+    public void mouseUp(MouseClickEvent event) {
+        this.mouseUp.forEach(mouseClickHandler -> mouseClickHandler.click(event));
     }
 }

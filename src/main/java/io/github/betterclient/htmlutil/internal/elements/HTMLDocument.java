@@ -24,6 +24,15 @@ public class HTMLDocument extends HTMLElement {
     public HTMLDocument(String src) {
         super(null, Jsoup.parseBodyFragment(src).body());
         this.loadStyleElements();
+        this.recursiveReload(this);
+    }
+
+    public void recursiveReload(HTMLNode<?> n) {
+        for (HTMLNode<? extends Node> child : n.children) {
+            recursiveReload(child);
+        }
+
+        n.reload();
     }
 
     public void openAsScreen(DocumentScreenOptions options) {
@@ -47,7 +56,9 @@ public class HTMLDocument extends HTMLElement {
             }
         }
 
+        recursiveReload(this);
         loadPositions(this);
+        reloadPositions(this);
     }
 
     public void loadPositions(HTMLNode<?> node) {
@@ -55,7 +66,17 @@ public class HTMLDocument extends HTMLElement {
             loadPositions(child);
         }
 
-        DisplayMode mode = DisplayMode.create(node.style);
+        if (!node.style.calculate("width").equals("auto")) {
+            node.width = (int) node.parser.getSize("width");
+        }
+        if (!node.style.calculate("height").equals("auto")) {
+            node.height = (int) node.parser.getSize("height");
+        }
+
+        //Apply padding & margins
+        DisplayMode.applyMargins(node);
+
+        DisplayMode mode = DisplayMode.get(node.style);
         mode.loadPositions(node, new ElementRenderingContext(UIRenderingContext.DEFAULT_FONT));
     }
 
@@ -64,7 +85,6 @@ public class HTMLDocument extends HTMLElement {
         //The document has no rendering.
         //The document stays invisible for transparency.
     }
-    //TODO: add document.renderAsHud()
 
     private void loadStyleElements() {
         for (Element element : this.instance.select("style")) {
@@ -75,6 +95,7 @@ public class HTMLDocument extends HTMLElement {
     public void addStyleSheet(String src) {
         styleSheets.add(StyleSheetCompiler.compile(src));
         this.reloadCSS();
+        this.recursiveReload(this);
     }
 
     public Map<Node, CSSStyle> createCSSMap() {
@@ -109,5 +130,33 @@ public class HTMLDocument extends HTMLElement {
         for (HTMLNode<? extends Node> child : findDocument.children) {
             reloadInlineCSS(child);
         }
+    }
+
+    public void reloadPositions(HTMLNode<?> element) {
+        element.x = Math.max(element.x, 0);
+        element.y = Math.max(element.y, 0);
+
+        if (element.children.isEmpty()) return;
+
+        //Backwards recursive
+        for (HTMLNode<? extends Node> child : element.children) {
+            reloadPositions(child);
+        }
+
+        //Find lowest x & y values
+        int mx = Integer.MAX_VALUE, my = Integer.MAX_VALUE;
+        for (HTMLNode<? extends Node> child : element.children) {
+            mx = Math.min(child.x, mx);
+            my = Math.min(child.y, my);
+        }
+
+        //Set the lowest to 0
+        for (HTMLNode<? extends Node> child : element.children) {
+            child.x -= mx;
+            child.y -= my;
+        }
+
+        element.x += mx;
+        element.y += my;
     }
 }
