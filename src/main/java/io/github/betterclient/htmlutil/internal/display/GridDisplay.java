@@ -3,6 +3,7 @@ package io.github.betterclient.htmlutil.internal.display;
 import io.github.betterclient.htmlutil.internal.nodes.HTMLNode;
 import io.github.betterclient.htmlutil.internal.render.ElementRenderingContext;
 
+//TODO: rewrite this
 public class GridDisplay extends DisplayMode {
     static final DisplayMode INSTANCE = new GridDisplay();
 
