@@ -45,7 +45,6 @@ public abstract class HTMLNode<T extends Node> {
             this.parent = null;
             this.style = new CSSStyle(null);
         }
-        reload();
 
         HTMLNode<?> node = this;
         while(node.parent0 != null) {
@@ -53,6 +52,8 @@ public abstract class HTMLNode<T extends Node> {
         }
         this.document = (HTMLDocument) node;
         this.parser = new StyleParser(this.document, style);
+
+        reload();
     }
 
     /**
