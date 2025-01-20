@@ -32,7 +32,7 @@ Java engine for HTML.
     }
   }
   ```
-- Pick a service (eg: `new MCTMLService()`)
+- Pick a service (eg: [MCTML Service](https://github.com/betterclient/mctml))
 - Call HTMLDocument.openAsScreen on your class:
   ```java
   new YourClass().openAsScreen();
