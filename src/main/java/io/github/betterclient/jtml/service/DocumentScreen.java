@@ -39,6 +39,14 @@ public interface DocumentScreen {
     void mouseReleased(double mouseX, double mouseY, int button);
 
     /**
+     * MouseScroll event
+     * @param mouseX mouse position
+     * @param mouseY mouse position
+     * @param direction direction (-1=down, 1=up)
+     */
+    void mouseScroll(double mouseX, double mouseY, int direction);
+
+    /**
      * Keyboard char type event
      * @param chr char typed
      */
