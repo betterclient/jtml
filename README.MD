@@ -1,15 +1,12 @@
-# HTMLUtil
+# JTML
 
 Create stunning interfaces for minecraft with HTML.
 
 # Usage
 
-- Before we start: This is still a **WIP** library, you might have to do **MASSIVE** changes to your codebase. This implementation is from scratch and things may not be 100% accurate to browser rendering.  
-
-[//]: <> (You know what else is massive?) 
-
-##### Steps: 
-- Create a new source file. (java/kotlin/groovy/whatever)
+- Before we start: This is still a **WIP** library, you might have to do **MASSIVE** changes to your codebase. This implementation is from scratch and things may not be 100% accurate to browser rendering.
+ 
+- Create a new source file.
 - Extend `HTMLDocument`:
   ```java
   public class YourClass extends HTMLDocument {
@@ -29,12 +26,13 @@ Create stunning interfaces for minecraft with HTML.
   public class YourClass extends HTMLDocument {
     public YourClass() {
         //You have 3 options
-        super(); //Empty document.
-        super("HTML goes here"); //Document with text as source.
-        super("myhtml.html"); //Document with asset as source.
+        super(/*your service of choice*/); //Empty document.
+        super(/*your service of choice*/, "HTML goes here"); //Document with text as source.
+        super(/*your service of choice*/, "myhtml.html"); //Document with asset as source.
     }
   }
   ```
+- Pick a service (eg: `new MCTMLService()`)
 - Call HTMLDocument.openAsScreen on your class:
   ```java
   new YourClass().openAsScreen();
