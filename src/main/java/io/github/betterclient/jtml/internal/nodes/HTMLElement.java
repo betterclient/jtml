@@ -7,12 +7,17 @@ import org.jsoup.nodes.Node;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public abstract class HTMLElement extends HTMLNode<Element> {
     private List<Node> oldElements;
 
     protected HTMLElement(HTMLNode<?> parent, Element instance) {
         super(parent, instance);
+    }
+
+    protected HTMLElement(Consumer<HTMLNode<?>> consumer, HTMLNode<?> parent, Element instance) {
+        super(consumer, parent, instance);
     }
 
     /**

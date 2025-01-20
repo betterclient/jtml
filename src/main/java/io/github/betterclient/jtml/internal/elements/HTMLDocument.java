@@ -18,16 +18,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class HTMLDocument extends HTMLElement {
-    public final JTMLService service;
+    public JTMLService service;
     List<Map<String, CompiledStyleSheet>> styleSheets = new ArrayList<>();
 
     public HTMLNode<?> focusedNode = null;
 
-    public HTMLDocument(JTMLService service, String src) {
-        super(null, Jsoup.parseBodyFragment(src).body());
-        this.service = service;
+    public HTMLDocument(JTMLService service0, String src) {
+        super(htmlNode -> {
+            if (htmlNode instanceof HTMLDocument doc) {
+                doc.service = service0;
+            }
+        }, null, Jsoup.parseBodyFragment(src).body());
 
         this.loadStyleElements();
         this.recursiveReload(this);

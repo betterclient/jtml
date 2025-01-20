@@ -11,6 +11,7 @@ import org.jsoup.nodes.Node;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public abstract class HTMLNode<T extends Node> {
     public List<HTMLNode<? extends Node>> children = new ArrayList<>();
@@ -34,6 +35,11 @@ public abstract class HTMLNode<T extends Node> {
     public HTMLDocument document;
 
     protected HTMLNode(HTMLNode<? extends Node> parent, T instance) {
+        this(null, parent, instance);
+    }
+
+    protected HTMLNode(Consumer<HTMLNode<?>> beforeEverything, HTMLNode<? extends Node> parent, T instance) {
+        if (beforeEverything != null) beforeEverything.accept(this);
         this.instance = instance;
 
         if (parent != null) {
