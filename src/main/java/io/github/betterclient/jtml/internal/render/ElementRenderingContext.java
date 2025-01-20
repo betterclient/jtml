@@ -18,6 +18,13 @@ public class ElementRenderingContext {
     }
 
     public void drawBackground(HTMLNode<?> child) {
+        //this current function - drawBackground, is called before rendering an element
+        //Which 100% guarantees child is going to be rendered right after this call
+        //so just set it here and remove the call requirements
+        //this will also make things simpler -betterclient
+        //This note just exists, so you don't touch this file, this is hell please save me.
+        this.currentlyRendered = child;
+
         ElementDimensions box = child.getDimensions(this);
         float radius = child.parser.getSize("border-radius");
 
@@ -25,13 +32,6 @@ public class ElementRenderingContext {
 
         Border border = Border.parseBorderElement(child.style);
         border.render(this.currentlyRendered.document, context, child.getX(), child.getY(), box.width, box.height);
-
-        //this current function - drawBackground, is called before rendering an element
-        //Which 100% guarantees child is going to be rendered right after this call
-        //so just set it here and remove the call requirements
-        //this will also make things simpler -betterclient
-        //This note just exists, so you don't touch this file, this is hell please save me.
-        this.currentlyRendered = child;
     }
 
     public void renderText(String text) {
