@@ -1,6 +1,6 @@
 # JTML
 
-Create stunning interfaces for minecraft with HTML.
+Java engine for HTML.
 
 # Usage
 
