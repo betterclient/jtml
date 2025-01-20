@@ -110,6 +110,11 @@ public class DocumentRendererScreen implements DocumentScreen {
         mouseRelease(document, new MouseClickEvent(context, mouseX, mouseY, button));
     }
 
+    @Override
+    public void mouseScroll(double mouseX, double mouseY, int direction) {
+
+    }
+
     private boolean mouseRelease(HTMLNode<? extends Node> element, MouseClickEvent event) {
         ElementDimensions box = element.getDimensions(event.context());
         for (HTMLNode<? extends Node> child : element.children) {
