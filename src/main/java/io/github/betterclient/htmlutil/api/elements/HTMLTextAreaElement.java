@@ -28,11 +28,11 @@ public class HTMLTextAreaElement extends HTMLElement<io.github.betterclient.html
     }
 
     public void setText(String text) {
-        this.internal.typedText = text;
+        this.internal.handler.setTypedText(text);
         this.internal.reload();
     }
 
     public String getText() {
-        return this.internal.typedText;
+        return this.internal.handler.getTypedText();
     }
 }
