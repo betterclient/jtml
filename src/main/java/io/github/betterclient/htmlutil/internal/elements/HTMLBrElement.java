@@ -2,6 +2,7 @@ package io.github.betterclient.htmlutil.internal.elements;
 
 import io.github.betterclient.htmlutil.api.elements.HTMLDocument;
 import io.github.betterclient.htmlutil.internal.ElementDimensions;
+import io.github.betterclient.htmlutil.internal.nodes.HTMLElement;
 import io.github.betterclient.htmlutil.internal.nodes.HTMLNode;
 import io.github.betterclient.htmlutil.internal.render.ElementRenderingContext;
 import org.jsoup.nodes.Element;

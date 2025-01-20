@@ -5,6 +5,7 @@ import io.github.betterclient.htmlutil.internal.css.CSSStyle;
 import io.github.betterclient.htmlutil.internal.css.compiler.CompiledStyleSheet;
 import io.github.betterclient.htmlutil.internal.css.compiler.StyleSheetCompiler;
 import io.github.betterclient.htmlutil.internal.display.DisplayMode;
+import io.github.betterclient.htmlutil.internal.nodes.HTMLElement;
 import io.github.betterclient.htmlutil.internal.nodes.HTMLNode;
 import io.github.betterclient.htmlutil.internal.render.DocumentRenderer;
 import io.github.betterclient.htmlutil.internal.render.ElementRenderingContext;
@@ -20,6 +21,8 @@ import java.util.Map;
 
 public class HTMLDocument extends HTMLElement {
     List<Map<String, CompiledStyleSheet>> styleSheets = new ArrayList<>();
+
+    public HTMLNode<?> focusedNode = null;
 
     public HTMLDocument(String src) {
         super(null, Jsoup.parseBodyFragment(src).body());
@@ -48,7 +51,7 @@ public class HTMLDocument extends HTMLElement {
             for (String s : compilation.keySet()) {
                 for (Element element : instance.select(s)) {
                     for (Map.Entry<String, String> stringStringEntry : compilation.get(s).getProperties().entrySet()) {
-                        //System.out.println("For " + s + " -> " + stringStringEntry.getKey() + "=" + stringStringEntry.getValue());v
+                        //System.out.println("For " + s + " -> " + stringStringEntry.getKey() + "=" + stringStringEntry.getValue());
                         CSSStyle style = map.get(element);
                         style.MAP.put(stringStringEntry.getKey(), stringStringEntry.getValue());
                     }

@@ -17,7 +17,7 @@ import java.util.Map;
  * This is the main HTMLDocument class, you should extend this class.
  */
 public class HTMLDocument extends HTMLElement<io.github.betterclient.htmlutil.internal.elements.HTMLDocument> {
-    Map<io.github.betterclient.htmlutil.internal.elements.HTMLElement, HTMLElement<?>> internalToMapped = new HashMap<>();
+    Map<io.github.betterclient.htmlutil.internal.nodes.HTMLElement, HTMLElement<?>> internalToMapped = new HashMap<>();
 
     /**
      * Create a new HTMLDocument
@@ -49,7 +49,7 @@ public class HTMLDocument extends HTMLElement<io.github.betterclient.htmlutil.in
         internalToMapped.put(element.internal, element);
 
         for (HTMLNode<? extends Node> child : element.internal.children) {
-            if (child instanceof io.github.betterclient.htmlutil.internal.elements.HTMLElement el)
+            if (child instanceof io.github.betterclient.htmlutil.internal.nodes.HTMLElement el)
                 this.cacheInternals(el.toAPI(this));
         }
     }
@@ -91,7 +91,7 @@ public class HTMLDocument extends HTMLElement<io.github.betterclient.htmlutil.in
     @SuppressWarnings("unchecked")
     public final <T extends HTMLElement<?>> T getElementById(String id) {
         Element element = this.internal.instance.getElementById(id);
-        for (io.github.betterclient.htmlutil.internal.elements.HTMLElement htmlElement : this.internalToMapped.keySet()) {
+        for (io.github.betterclient.htmlutil.internal.nodes.HTMLElement htmlElement : this.internalToMapped.keySet()) {
             if (htmlElement.instance == element) {
                 HTMLElement<?> element1 = this.internalToMapped.get(htmlElement);
                 return (T) element1;
@@ -109,7 +109,7 @@ public class HTMLDocument extends HTMLElement<io.github.betterclient.htmlutil.in
     public final List<HTMLElement<?>> select(String cssSelector) {
         List<HTMLElement<?>> elements = new ArrayList<>();
         Elements elements0 = this.internal.instance.select(cssSelector);
-        for (io.github.betterclient.htmlutil.internal.elements.HTMLElement htmlElement : this.internalToMapped.keySet()) {
+        for (io.github.betterclient.htmlutil.internal.nodes.HTMLElement htmlElement : this.internalToMapped.keySet()) {
             if (elements0.contains(htmlElement.instance)) {
                 HTMLElement<?> element1 = this.internalToMapped.get(htmlElement);
                 elements.add(element1);

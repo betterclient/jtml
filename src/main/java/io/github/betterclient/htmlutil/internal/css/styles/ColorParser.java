@@ -1,4 +1,4 @@
-package io.github.betterclient.htmlutil.internal.css;
+package io.github.betterclient.htmlutil.internal.css.styles;
 
 import java.awt.*;
 import java.util.HashMap;

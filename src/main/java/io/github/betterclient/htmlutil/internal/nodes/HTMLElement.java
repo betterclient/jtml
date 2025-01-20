@@ -1,15 +1,14 @@
-package io.github.betterclient.htmlutil.internal.elements;
+package io.github.betterclient.htmlutil.internal.nodes;
 
 import io.github.betterclient.htmlutil.api.elements.HTMLDocument;
 import io.github.betterclient.htmlutil.internal.ElementParser;
-import io.github.betterclient.htmlutil.internal.nodes.HTMLNode;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class HTMLElement extends HTMLNode<@org.jetbrains.annotations.NotNull Element> {
+public abstract class HTMLElement extends HTMLNode<Element> {
     private List<Node> oldElements;
 
     protected HTMLElement(HTMLNode<?> parent, Element instance) {

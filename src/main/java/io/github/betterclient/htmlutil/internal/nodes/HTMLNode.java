@@ -92,10 +92,10 @@ public abstract class HTMLNode<T extends Node> {
     }
 
     public void mouseDown(MouseClickEvent event) {
-        this.mouseDown.forEach(mouseClickHandler -> mouseClickHandler.click(event));
+        this.mouseDown.forEach(mouseClickHandler -> mouseClickHandler.handle(event));
     }
 
     public void mouseUp(MouseClickEvent event) {
-        this.mouseUp.forEach(mouseClickHandler -> mouseClickHandler.click(event));
+        this.mouseUp.forEach(mouseClickHandler -> mouseClickHandler.handle(event));
     }
 }

@@ -40,6 +40,10 @@ public class CSSStyle {
                             "border",
                             "none"
                     ),
+                    Map.entry(
+                            "border-radius",
+                            "0"
+                    ),
 
                     //-----BACKGROUND-----
                     Map.entry(
@@ -169,6 +173,10 @@ public class CSSStyle {
                     Map.entry(
                             "border",
                             "none"
+                    ),
+                    Map.entry(
+                            "border-radius",
+                            "0"
                     ),
 
                     //-----BACKGROUND-----

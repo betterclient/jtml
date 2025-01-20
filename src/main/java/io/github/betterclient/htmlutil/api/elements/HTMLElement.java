@@ -1,13 +1,14 @@
 package io.github.betterclient.htmlutil.api.elements;
 
 import io.github.betterclient.htmlutil.api.ElementStyle;
+import io.github.betterclient.htmlutil.api.event.Event;
 import io.github.betterclient.htmlutil.api.event.MouseClickHandler;
 import lombok.Getter;
 
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public class HTMLElement<T extends io.github.betterclient.htmlutil.internal.elements.HTMLElement> {
+public class HTMLElement<T extends io.github.betterclient.htmlutil.internal.nodes.HTMLElement> {
     @Getter protected final T internal;
     @Getter protected final ElementStyle style;
     protected final HTMLDocument document;
@@ -24,6 +25,7 @@ public class HTMLElement<T extends io.github.betterclient.htmlutil.internal.elem
      */
     public final void appendElement(HTMLElement<?> element) {
         internal.children.add(element.getInternal());
+        internal.instance.appendChild(element.internal.instance);
         document.internalToMapped.put(element.getInternal(), element);
         document.internal.reload();
     }
@@ -35,6 +37,17 @@ public class HTMLElement<T extends io.github.betterclient.htmlutil.internal.elem
     public final void setID(String id) {
         internal.instance.id(id);
         document.internal.reload();
+    }
+
+    public final void addEventListener(String listener, Event<?> event) {
+        switch (listener.toLowerCase()) {
+            case "mousedown", "onmousedown":
+                onMouseDown((MouseClickHandler) event);
+                break;
+            case "mouseup", "onmouseup":
+                onMouseUp((MouseClickHandler) event);
+                break;
+        }
     }
 
     /**

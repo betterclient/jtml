@@ -1,12 +1,18 @@
 package io.github.betterclient.htmlutil.internal.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.betterclient.htmlutil.api.KeyboardKey;
 import io.github.betterclient.htmlutil.internal.css.styles.TextDecoration;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.ShaderProgramKey;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.*;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 
 public class UIRenderingContext {
     public static final UIRenderingContext DEFAULT_FONT = new UIRenderingContext(null);
@@ -57,5 +63,97 @@ public class UIRenderingContext {
 
     public void fill(float x, float y, float endX, float endY, int color) {
         context.fill((int) x, (int) y, (int) endX, (int) endY, color);
+    }
+
+    @SuppressWarnings("all")
+    public void fillRound(float x, float y, float endX, float endY, int color, float radius) {
+        Tessellator tessellator = Tessellator.getInstance();
+        RenderSystem.enableBlend();
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        BufferBuilder builder = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
+
+        float store = x;
+        x = Math.min(x, endX);
+        endX = Math.max(store, endX);
+        store = y;
+        y = Math.min(y, endY);
+        endY = Math.max(store, endY);
+        radius/=2;
+
+        int n2;
+        for (n2 = 0; n2 <= 90; n2 += 3) {
+            builder.vertex(
+                    (float) (x + radius + Math.sin(
+                            n2 * Math.PI / 180
+                    ) * (radius * -1)),
+                    (float) (y + radius + Math.cos(
+                            n2 * Math.PI / 180
+                    ) * (radius * -1)), 0)
+
+                    .color(color);
+        }
+        for (n2 = 90; n2 <= 180; n2 += 3) {
+            builder.vertex(
+                    (float) (x + radius + Math.sin(
+                            n2 * Math.PI / 180
+                    ) * (radius * -1)),
+                    (float) (endY - radius + Math.cos(
+                            n2 * Math.PI / 180
+                    ) * (radius * -1)), 0)
+
+                    .color(color);
+        }
+        for (n2 = 0; n2 <= 90; n2 += 3) {
+            builder.vertex(
+                    (float) (endX - radius + Math.sin(
+                            n2 * Math.PI / 180
+                    ) * radius),
+                    (float) (endY - radius + Math.cos(
+                            n2 * Math.PI / 180
+                    ) * radius),
+                    0)
+
+                    .color(color);
+        }
+        for (n2 = 90; n2 <= 180; n2 += 3) {
+            builder.vertex(
+                    (float) (endX - radius + Math.sin(
+                            n2 * Math.PI / 180
+                    ) * radius),
+                    (float) (y + radius + Math.cos(
+                            n2 * Math.PI / 180
+                    ) * radius), 0)
+
+                    .color(color);
+        }
+
+        BufferRenderer.drawWithGlobalProgram(builder.end());
+        RenderSystem.disableBlend();
+    }
+
+    public KeyboardKey getKey(int code) {
+        return switch (code) {
+            case GLFW.GLFW_KEY_LEFT_SHIFT, GLFW.GLFW_KEY_RIGHT_SHIFT -> KeyboardKey.SHIFT;
+            case GLFW.GLFW_KEY_BACKSPACE -> KeyboardKey.BACKSPACE;
+            case GLFW.GLFW_KEY_ENTER -> KeyboardKey.ENTER;
+            case GLFW.GLFW_KEY_LEFT_CONTROL -> KeyboardKey.CONTROL;
+            case GLFW.GLFW_KEY_UP -> KeyboardKey.ARROW_UP;
+            case GLFW.GLFW_KEY_DOWN -> KeyboardKey.ARROW_DOWN;
+            case GLFW.GLFW_KEY_RIGHT -> KeyboardKey.ARROW_RIGHT;
+            case GLFW.GLFW_KEY_LEFT -> KeyboardKey.ARROW_LEFT;
+            default -> null; //Unsupported keys should be ignored, please.
+        };
+    }
+
+    public int scrWidth() {
+        return MinecraftClient.getInstance().getWindow().getScaledWidth();
+    }
+
+    public int scrHeight() {
+        return MinecraftClient.getInstance().getWindow().getScaledHeight();
+    }
+
+    public String getClipboard() {
+        return MinecraftClient.getInstance().keyboard.getClipboard();
     }
 }

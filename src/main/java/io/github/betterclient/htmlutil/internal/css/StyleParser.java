@@ -1,5 +1,6 @@
 package io.github.betterclient.htmlutil.internal.css;
 
+import io.github.betterclient.htmlutil.internal.css.styles.ColorParser;
 import io.github.betterclient.htmlutil.internal.render.ElementRenderingContext;
 import io.github.betterclient.htmlutil.internal.render.UIRenderingContext;
 

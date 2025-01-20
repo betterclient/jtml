@@ -1,7 +1,6 @@
 package io.github.betterclient.htmlutil.internal.css.styles;
 
 import io.github.betterclient.htmlutil.internal.css.CSSStyle;
-import io.github.betterclient.htmlutil.internal.css.ColorParser;
 import io.github.betterclient.htmlutil.internal.css.StyleParser;
 import io.github.betterclient.htmlutil.internal.render.UIRenderingContext;
 import lombok.Getter;

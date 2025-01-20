@@ -4,7 +4,7 @@ Create stunning interfaces for minecraft with HTML.
 
 # Usage
 
-- Before we start: This is still a **WIP** library, you might have to do **MASSIVE** changes to your codebase. This is an implementation of HTML Rendering and things may not be 100% accurate to browser rendering.  
+- Before we start: This is still a **WIP** library, you might have to do **MASSIVE** changes to your codebase. This implementation is from scratch and things may not be 100% accurate to browser rendering.  
 
 [//]: <> (You know what else is massive?) 
 
@@ -71,7 +71,11 @@ HTMLUtil has an API for doing basically everything you can do with javascript, u
 <span>
 <br>
 <button>
+<div>
+<label>
+<input>
 <body>
+<h1-6>
 ```
 - Supported properties `* means anything that works in normal css`
 ```css
@@ -79,6 +83,7 @@ display: inline | flex | grid;
 background-color: *;
 color: *;
 text-decoration: strikethrough | underline | none;
+border-radius: *;
 
 justify-content: left | center | right;
 align-items: start | center | end;

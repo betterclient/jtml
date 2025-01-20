@@ -1,6 +1,7 @@
 package io.github.betterclient.htmlutil.internal;
 
 import io.github.betterclient.htmlutil.internal.elements.*;
+import io.github.betterclient.htmlutil.internal.nodes.HTMLElement;
 import io.github.betterclient.htmlutil.internal.nodes.HTMLNode;
 import io.github.betterclient.htmlutil.internal.nodes.HTMLTextNode;
 import joptsimple.internal.Strings;
@@ -33,6 +34,18 @@ public class ElementParser {
                     Map.entry(
                             "div",
                             pair -> new HTMLDivElement(pair.left(), pair.right())
+                    ),
+                    Map.entry(
+                            "label",
+                            pair -> new HTMLLabelElement(pair.left(), pair.right())
+                    ),
+                    Map.entry(
+                            "input",
+                            pair -> new HTMLInputElement(pair.left(), pair.right())
+                    ),
+                    Map.entry(
+                            "textarea",
+                            pair -> new HTMLTextAreaElement(pair.left(), pair.right())
                     ),
 
                     //-----HEADERS-----

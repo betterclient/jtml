@@ -41,6 +41,6 @@ public class MixinTitleScreen extends Screen {
         doc.getElementById("ot").onMouseUp(event -> start(2));
 
         doc.openAsScreen(new DocumentScreenOptions(true, true));
-        System.out.println("Document took " + (System.currentTimeMillis() - start) + "milliseconds to open");
+        System.out.println("Document took " + (System.currentTimeMillis() - start) + " milliseconds to open");
     }
 }

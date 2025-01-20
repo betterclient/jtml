@@ -1,28 +1,32 @@
 package io.github.betterclient.htmlutil.internal.nodes;
 
 import io.github.betterclient.htmlutil.internal.ElementDimensions;
-import io.github.betterclient.htmlutil.internal.elements.HTMLElement;
 import io.github.betterclient.htmlutil.internal.render.ElementRenderingContext;
 import io.github.betterclient.htmlutil.internal.render.UIRenderingContext;
 import net.minecraft.client.resource.language.I18n;
 import org.jsoup.nodes.TextNode;
 
 public class HTMLTextNode extends HTMLNode<TextNode> {
+    public boolean reload = false;
+
     public HTMLTextNode(TextNode instance, HTMLElement parent) {
         super(parent, instance);
     }
 
     @Override
     public void render(ElementRenderingContext context) {
+        if (reload && this.parent0.style.calculate("text-align").equals("center")) {
+            reload = false;
+            centerAllChildren();
+            context.x = this.getX();
+            context.y = this.getY();
+        }
+
         String text = stripFirst(instance.text());
 
         if (text.startsWith("Translate->")) text = I18n.translate(text.substring(11));
 
         context.renderText(text);
-
-        if (this.parent0.style.calculate("text-align").equals("center")) {
-            centerAllChildren();
-        }
     }
 
     @Override
@@ -36,6 +40,7 @@ public class HTMLTextNode extends HTMLNode<TextNode> {
         } else if (this.parent0.parser.getSize("padding") > 0) {
             this.display$moveDown = true;
         }
+        reload = true;
     }
 
     private void centerAllChildren() {
