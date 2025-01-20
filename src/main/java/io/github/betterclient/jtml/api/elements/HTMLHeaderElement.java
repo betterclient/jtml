@@ -4,7 +4,7 @@ import org.jsoup.nodes.Element;
 
 /**
  * You should use the "count" variable to declare the header count
- * eg: count=5 is < h5>
+ * eg: count=5 is "h5"
 */
 public class HTMLHeaderElement extends HTMLElement<io.github.betterclient.jtml.internal.elements.HTMLHeaderElement> {
     public HTMLHeaderElement(HTMLDocument document, HTMLElement<?> parent, String text, int count) {

@@ -72,6 +72,7 @@ HTMLUtil has an API for doing basically everything you can do with javascript, u
 <div>
 <label>
 <input>
+<textarea>
 <body>
 <h1-6>
 ```

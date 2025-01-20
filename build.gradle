@@ -1,7 +1,7 @@
 plugins {
     id "java"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
     id("io.freefair.lombok") version "8.11"
+    id("maven-publish")
 }
 
 version = "1.0-ALPHA"
@@ -33,10 +33,20 @@ java {
     if (JavaVersion.current() < javaVersion) {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
+
+    withJavadocJar()
 }
 
 jar {
     from("LICENSE") {
         rename { "JTML_LICENSE" }
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
     }
 }
