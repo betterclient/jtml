@@ -52,6 +52,8 @@ public interface RenderingService {
 
     /**
      * Return the corresponding key
+     * <br>
+     * Don't throw exceptions from this.
      * @param code code of key
      * @return key
      */
@@ -75,7 +77,8 @@ public interface RenderingService {
     /**
      * Get the string on the clipboard
      * This will only be used if a HeadlessException is thrown by {@link Toolkit#getDefaultToolkit()}
-     * @apiNote Don't throw exceptions from this.
+     * <br>
+     * Don't throw exceptions from this.
      * @return clipboard
      */
     @AlwaysWork
@@ -92,6 +95,7 @@ public interface RenderingService {
 
     /**
      * End scissoring
+     * <br>
      * MUST WORK WITH SCISSORING DISABLED TOO
      */
     void endScissor();

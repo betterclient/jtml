@@ -24,7 +24,8 @@ public interface JTMLService {
 
     /**
      * Get the current DocumentScreen
-     * @apiNote nullable
+     * <br>
+     * nullable
      */
     DocumentScreen getDocument();
 }

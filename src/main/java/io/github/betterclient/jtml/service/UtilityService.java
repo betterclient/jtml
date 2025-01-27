@@ -11,7 +11,8 @@ public interface UtilityService {
     /**
      * Get a key name
      * Should return null for non-alphabetic keys
-     * @apiNote Don't throw exceptions from this.
+     * <br>
+     * Don't throw exceptions from this.
      * @return provided key's name (ex: "v")
      */
     String getKeyName(int keyCode, int scanCode);

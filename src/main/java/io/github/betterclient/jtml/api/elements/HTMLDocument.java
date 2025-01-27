@@ -147,7 +147,8 @@ public class HTMLDocument extends HTMLElement<io.github.betterclient.jtml.intern
 
     /**
      * Get the currently open HTMLDocument
-     * @apiNote NULLABLE!!!
+     * <br>
+     * NULLABLE!!!
      * @param service service to get for
      * @return open document
      */
