@@ -1,6 +1,6 @@
 package io.github.betterclient.jtml.service;
 
-import io.github.betterclient.jtml.api.KeyboardKey;
+import io.github.betterclient.jtml.api.event.KeyboardKey;
 import io.github.betterclient.jtml.internal.css.styles.TextDecoration;
 
 import java.awt.*;
@@ -27,7 +27,7 @@ public interface RenderingService {
      * @return width of text
      */
     @AlwaysWork
-    int width(String text);
+    int width(String text, TextDecoration decoration);
 
     /**
      * Fill a rectangle
@@ -75,8 +75,31 @@ public interface RenderingService {
     /**
      * Get the string on the clipboard
      * This will only be used if a HeadlessException is thrown by {@link Toolkit#getDefaultToolkit()}
+     * @apiNote Don't throw exceptions from this.
      * @return clipboard
      */
     @AlwaysWork
     String getClipboard();
+
+    /**
+     * Start scissoring rendered stuff
+     * @param x left
+     * @param y top
+     * @param width width
+     * @param height height
+     */
+    void startScissor(int x, int y, int width, int height);
+
+    /**
+     * End scissoring
+     * MUST WORK WITH SCISSORING DISABLED TOO
+     */
+    void endScissor();
+
+    /**
+     * Put the given text in the clipboard
+     * @param text text
+     */
+    @AlwaysWork
+    void setClipboard(String text);
 }

@@ -1,4 +1,4 @@
-package io.github.betterclient.jtml.api;
+package io.github.betterclient.jtml.api.event;
 
 public enum KeyboardKey {
     BACKSPACE, SHIFT, CONTROL, ENTER,

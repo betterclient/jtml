@@ -34,10 +34,13 @@ public class MultilineStringInputHandler extends StringInputHandler {
 
         displayedText = currentText.toString();
     }
-
+    
     @Override
     public void renderVerticalLine(int width, ElementRenderingContext context) {
-        String pointing = displayedText.substring(0, this.pointer == -1 ? displayedText.length() : this.pointer);
+        pointer = Math.min(pointer, typedText.length());
+
+        int index = this.pointer == -1 ? displayedText.length() : this.pointer;
+        String pointing = displayedText.substring(0, Math.min(index, displayedText.length()));
         if (pointing.isEmpty()) return;
 
         int y = (int) (pointing.split("\n").length * this.owner.parser.getSize("font-size"));
@@ -47,6 +50,38 @@ public class MultilineStringInputHandler extends StringInputHandler {
 
     @Override
     public void enter(ElementRenderingContext context) {
+        this.lastTypedTexts.add(typedText);
         this.type(context, '\n', false);
+    }
+
+    @Override
+    public void renderSelection(ElementRenderingContext context) {
+        if (pointerWidth == 0) return;
+        int pointer = this.pointer == -1 ? displayedText.length() : this.pointer;
+
+        int start = pointer - Math.min(pointerWidth, 0);
+        int end = pointer + Math.max(pointerWidth, 0);
+        end = Math.min(end, displayedText.length());
+
+        int temp = start;
+        if (end < start) {
+            start = end;
+            end = temp;
+        }
+
+        float size = owner.parser.getSize("font-size");
+        String[] split = displayedText.substring(0, start).split("\n");
+        int index = split.length;
+        int acIndex = 0;
+        for (String s : displayedText.substring(start, end).split("\n")) {
+            int yStart = (int) (index * size - size);
+            int yEnd = (int) size;
+            String concatStart = acIndex == 0 ? split[split.length - 1] : "";
+
+            context.fill(context.width(concatStart), yStart, context.width(concatStart + s), yEnd, -1);
+
+            index++;
+            acIndex++;
+        }
     }
 }

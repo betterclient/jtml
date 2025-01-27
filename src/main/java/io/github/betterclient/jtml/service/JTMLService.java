@@ -11,10 +11,20 @@ public interface JTMLService {
      */
     RenderingService getFontService();
 
+    /**
+     * Get the utility service
+     * @return service
+     */
     UtilityService getUtilityService();
 
     /**
      * Open a {@link DocumentScreen}
      */
     void openScreen(DocumentScreen document);
+
+    /**
+     * Get the current DocumentScreen
+     * @apiNote nullable
+     */
+    DocumentScreen getDocument();
 }

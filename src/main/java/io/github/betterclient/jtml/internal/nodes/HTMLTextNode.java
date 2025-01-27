@@ -9,11 +9,16 @@ public class HTMLTextNode extends HTMLNode<TextNode> {
 
     public HTMLTextNode(TextNode instance, HTMLElement parent) {
         super(parent, instance);
+
+        //text node inheritance
+        this.style.MAP.put("text-decoration", "default");
+        this.style.MAP.put("width-offset", "default");
+        this.style.MAP.put("text-align", "default");
     }
 
     @Override
     public void render(ElementRenderingContext context) {
-        if (reload && this.parent0.style.calculate("text-align").equals("center")) {
+        if (reload && this.style.calculate("text-align").equals("center")) {
             reload = false;
             centerAllChildren();
             context.x = this.getX();

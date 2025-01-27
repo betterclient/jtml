@@ -1,6 +1,7 @@
 package io.github.betterclient.jtml.internal.nodes;
 
-import io.github.betterclient.jtml.api.KeyboardKey;
+import io.github.betterclient.jtml.api.event.KeyboardKey;
+import io.github.betterclient.jtml.internal.elements.HTMLInputElement;
 import io.github.betterclient.jtml.internal.util.ElementDimensions;
 import io.github.betterclient.jtml.internal.css.styles.Border;
 import io.github.betterclient.jtml.internal.elements.HTMLDocument;
@@ -51,8 +52,14 @@ public abstract class FocusableElement extends HTMLElement {
     }
 
     @Override
+    @SuppressWarnings("SuspiciousRegexArgument") //waah waah cry louder
     public void render(ElementRenderingContext context) {
-        int width = context.renderText(this.handler.getDisplayedText(), 2);
+        String t = this.handler.getDisplayedText();
+        if (this instanceof HTMLInputElement a && a.instance.attr("type").equals("password")) {
+            t = t.replaceAll(".", "*");
+        }
+
+        int width = context.renderText(t, 2);
 
         if (this.isFocused()) {
             Border border = new Border();
@@ -61,6 +68,7 @@ public abstract class FocusableElement extends HTMLElement {
             border.setColor("white");
             border.render(this.document, context.context, this.getX(), this.getY(), this.getDimensions(context).width, this.getDimensions(context).height);
             this.handler.renderVerticalLine(width, context);
+            this.handler.renderSelection(context);
         } else {
             this.handler.reset();
         }
@@ -103,14 +111,15 @@ public abstract class FocusableElement extends HTMLElement {
         MODIFIERS_PRESSED.remove(key);
 
         boolean controlPressed = MODIFIERS_PRESSED.contains(KeyboardKey.CONTROL);
-        handleKeys(context, key, controlPressed);
+        boolean shiftPressed = MODIFIERS_PRESSED.contains(KeyboardKey.SHIFT);
+        handleKeys(context, key, controlPressed, shiftPressed);
     }
 
-    private void handleKeys(ElementRenderingContext context, KeyboardKey key, boolean controlPressed) {
+    private void handleKeys(ElementRenderingContext context, KeyboardKey key, boolean controlPressed, boolean shiftPressed) {
         switch (key) {
             case BACKSPACE -> this.handler.backspace(controlPressed);
-            case ARROW_LEFT -> this.handler.leftArrow(controlPressed);
-            case ARROW_RIGHT -> this.handler.rightArrow(controlPressed);
+            case ARROW_LEFT -> this.handler.leftArrow(controlPressed, shiftPressed);
+            case ARROW_RIGHT -> this.handler.rightArrow(controlPressed, shiftPressed);
             case ENTER -> this.handler.enter(context);
         }
 

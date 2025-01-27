@@ -62,7 +62,7 @@ This will get interpreted as:
 Since this implementation is from scratch, support for some elements/properties is missing.
 
 ### ❌ NO JAVASCRIPT. 
-HTMLUtil has an API for doing basically everything you can do with javascript, using java.
+JTML has an API for doing basically everything you can do with javascript, using java.
 
 - Supported Elements
 ```html
@@ -73,6 +73,10 @@ HTMLUtil has an API for doing basically everything you can do with javascript, u
 <label>
 <input>
 <textarea>
+<a>
+<b>
+<i>
+<canvas> (with 2d context)
 <body>
 <h1-6>
 ```
@@ -82,7 +86,9 @@ display: inline | flex | grid;
 background-color: *;
 color: *;
 text-decoration: strikethrough | underline | none;
+font-weight: bold | italic | none;
 border-radius: *;
+border: 2px solid black;
 
 justify-content: left | center | right;
 align-items: start | center | end;

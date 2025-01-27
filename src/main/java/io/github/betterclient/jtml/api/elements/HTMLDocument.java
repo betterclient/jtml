@@ -1,8 +1,10 @@
 package io.github.betterclient.jtml.api.elements;
 
-import io.github.betterclient.jtml.api.DocumentScreenOptions;
+import io.github.betterclient.jtml.api.util.DocumentScreenOptions;
 import io.github.betterclient.jtml.internal.nodes.HTMLNode;
+import io.github.betterclient.jtml.internal.render.DocumentRendererScreen;
 import io.github.betterclient.jtml.service.JTMLService;
+import lombok.SneakyThrows;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
@@ -19,12 +21,14 @@ import java.util.Map;
  */
 public class HTMLDocument extends HTMLElement<io.github.betterclient.jtml.internal.elements.HTMLDocument> {
     Map<io.github.betterclient.jtml.internal.nodes.HTMLElement, HTMLElement<?>> internalToMapped = new HashMap<>();
+    public final String base;
 
     /**
      * Create a new HTMLDocument
      * @param src source of the HTML file, either a resource location (resources folder) or a html source code
      * @param service Service to use for this document
      */
+    @SneakyThrows
     public HTMLDocument(String src, JTMLService service) {
         super(null, () -> {
             io.github.betterclient.jtml.internal.elements.HTMLDocument internal;
@@ -44,6 +48,16 @@ public class HTMLDocument extends HTMLElement<io.github.betterclient.jtml.intern
             return internal;
         });
 
+        InputStream stream = HTMLDocument.class.getResourceAsStream(src);
+        if (stream != null) {
+            base = src;
+            stream.close();
+        } else {
+            base = "";
+        }
+
+        internal.setApi(this);
+
         cacheInternals(this);
     }
 
@@ -61,6 +75,8 @@ public class HTMLDocument extends HTMLElement<io.github.betterclient.jtml.intern
      */
     public HTMLDocument(JTMLService service) {
         super(null, () -> new io.github.betterclient.jtml.internal.elements.HTMLDocument(service, ""));
+        internal.setApi(this);
+        base = "";
     }
 
     /**
@@ -127,5 +143,15 @@ public class HTMLDocument extends HTMLElement<io.github.betterclient.jtml.intern
      */
     public final void openAsScreen(DocumentScreenOptions options) {
         internal.openAsScreen(options);
+    }
+
+    /**
+     * Get the currently open HTMLDocument
+     * @apiNote NULLABLE!!!
+     * @param service service to get for
+     * @return open document
+     */
+    public static HTMLDocument current(JTMLService service) {
+        return service.getDocument() instanceof DocumentRendererScreen screen ? screen.document.api : null;
     }
 }

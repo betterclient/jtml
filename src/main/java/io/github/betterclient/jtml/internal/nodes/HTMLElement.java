@@ -54,6 +54,7 @@ public abstract class HTMLElement extends HTMLNode<Element> {
 
         document.reloadInlineCSS(document); //Reload css
         document.loadPositions(document); //Reload elements for every change to the dom
+        document.reloadPositions(document);
     }
 
     @Override

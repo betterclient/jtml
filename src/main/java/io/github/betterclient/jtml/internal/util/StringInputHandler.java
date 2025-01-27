@@ -8,25 +8,41 @@ import lombok.Setter;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
-//TODO: shift and selection
-//TODO: cutting and copying
 public class StringInputHandler {
     public final FocusableElement owner;
 
-    @Getter @Setter public String typedText;
-    @Getter public String displayedText = "";
+    @Getter
+    @Setter
+    public String typedText;
+    @Getter
+    public String displayedText = "";
+    public Pattern allowedCharacterRegex = Pattern.compile(".");
 
     protected int pointer = -1;
     protected int pointerWidth = 0;
+    protected List<String> lastTypedTexts = new ArrayList<>();
 
     public StringInputHandler(FocusableElement owner, String typedText) {
         this.typedText = typedText;
+        this.lastTypedTexts.add(typedText);
         this.owner = owner;
     }
 
     public void reloadDisplay(ElementRenderingContext context) {
         if (typedText == null) typedText = "";
+
+        StringBuilder newTypedText = new StringBuilder();
+        for (char c : typedText.toCharArray()) {
+            if (this.allowedCharacterRegex.matcher(c + "").matches()) {
+                newTypedText.append(c);
+            }
+        }
+        typedText = newTypedText.toString();
+
         context.currentlyRendered = this.owner;
 
         int length = typedText.length();
@@ -36,6 +52,7 @@ public class StringInputHandler {
         if (pointer == -1) {
             pointer = length;
         }
+        pointer = Math.min(pointer, typedText.length());
 
         int start = pointer;
         int end = pointer;
@@ -55,6 +72,8 @@ public class StringInputHandler {
     }
 
     public void renderVerticalLine(int width, ElementRenderingContext context) {
+        pointer = Math.min(pointer, typedText.length());
+
         if (pointer == -1 || pointer == typedText.length()) {
             context.fillVerticalLine(width);
         } else {
@@ -87,10 +106,89 @@ public class StringInputHandler {
                     type = (String) far.getTransferData(DataFlavor.stringFlavor);
                 }
             } catch (Exception ignored) {
+                //make the service get it since we can't
                 type = context.context.getClipboard();
             }
+        } else if (type.toLowerCase().charAt(0) == 'c' && controlPressed) {
+            //copy selection
+            if (pointerWidth == 0) return;
+
+            pointer = Math.min(this.pointer, typedText.length());
+            int start = pointer;
+            int end = pointer + pointerWidth;
+
+            if (pointerWidth < 0) {
+                start = pointer + pointerWidth;
+                end = pointer;
+            }
+
+            start = Math.max(0, start);
+            end = Math.min(typedText.length(), end);
+
+            context.context.setClipboard(
+                    typedText.substring(start, end)
+            );
+
+            this.pointerWidth = 0;
+            return;
+        } else if (type.toLowerCase().charAt(0) == 'x' && controlPressed) {
+            //cut selection
+            if (pointerWidth == 0) return;
+            this.lastTypedTexts.add(typedText);
+
+            pointer = Math.min(this.pointer, typedText.length());
+            int start = pointer;
+            int end = pointer + pointerWidth;
+
+            if (pointerWidth < 0) {
+                start = pointer + pointerWidth;
+                end = pointer;
+            }
+
+            start = Math.max(0, start);
+            end = Math.min(typedText.length(), end);
+
+            context.context.setClipboard(
+                    typedText.substring(start, end)
+            );
+
+            typedText = typedText.substring(0, start) + typedText.substring(end);
+            this.pointerWidth = 0;
+            return;
+        } else if (type.toLowerCase().charAt(0) == 'z' && controlPressed) {
+            //undo
+            if (lastTypedTexts.isEmpty()) return;
+
+            typedText = lastTypedTexts.removeLast();
+
+            return;
+        } else if (type.toLowerCase().charAt(0) == 'a' && controlPressed) {
+            //select all
+            pointer = 0;
+            pointerWidth = typedText.length();
+            return;
+        }
+        this.lastTypedTexts.add(typedText);
+
+        if (pointerWidth != 0 && !typedText.isEmpty()) {
+            pointer = Math.min(this.pointer, typedText.length());
+            int start = pointer;
+            int end = pointer + pointerWidth;
+
+            if (pointerWidth < 0) {
+                start = pointer + pointerWidth;
+                end = pointer;
+            }
+
+            start = Math.max(0, start);
+            end = Math.min(typedText.length(), end);
+
+            typedText = typedText.substring(0, start) + type + typedText.substring(end);
+            pointerWidth = 0;
+            return;
         }
 
+        pointer = Math.min(this.pointer, typedText.length());
         int pointer = this.pointer < 0 ? typedText.length() : this.pointer;
         typedText = typedText.substring(0, pointer) + type + typedText.substring(pointer);
 
@@ -98,8 +196,26 @@ public class StringInputHandler {
     }
 
     public void backspace(boolean controlPressed) {
-        if (pointer == 0) return;
         if (pointer == -1) pointer = typedText.length();
+        this.lastTypedTexts.add(typedText);
+        pointer = Math.min(typedText.length(), pointer);
+
+        if (pointerWidth != 0 && !typedText.isEmpty()) {
+            int start = pointer;
+            int end = pointer + pointerWidth;
+
+            if (pointerWidth < 0) {
+                start = pointer + pointerWidth;
+                end = pointer;
+            }
+
+            start = Math.max(0, start);
+            end = Math.min(typedText.length(), end);
+
+            typedText = typedText.substring(0, start) + typedText.substring(end);
+            pointerWidth = 0;
+            return;
+        }
 
         String tr = typedText.substring(0, pointer);
         String after = typedText.substring(pointer);
@@ -122,41 +238,54 @@ public class StringInputHandler {
             }
             //hhhh hhhhhh hhhhhhhh hhhhhh
         } else {
+            if (tr.isEmpty()) return; //fuck you
+
             tr = tr.substring(0, tr.length() - 1);
             pointer--;
         }
 
         typedText = tr + after;
+
+        pointerWidth = 0;
     }
 
-    public void leftArrow(boolean controlPressed) {
+    public void leftArrow(boolean controlPressed, boolean shiftPressed) {
+        int startPointer = pointer == -1 ? typedText.length() : pointer;
         if (controlPressed) {
-            if(pointer == -1) {
+            if (pointer == -1) {
                 pointer = this.typedText.lastIndexOf(' ') + 1;
             } else {
-                while (this.typedText.charAt(pointer - 1) == ' ') pointer--;
+                while (pointer > 0 && this.typedText.charAt(pointer - 1) == ' ') pointer--;
 
                 if (pointer > 0) pointer = this.typedText.substring(0, pointer).lastIndexOf(' ') + 1;
             }
         } else {
-            if(pointer == -1) {
+            if (pointer == -1) {
                 pointer = this.typedText.length() - 1;
             } else {
                 if (pointer > 0) pointer--;
             }
         }
+
+        if (shiftPressed) {
+            pointerWidth -= pointer - startPointer;
+        } else {
+            pointerWidth = 0;
+        }
     }
 
-    public void rightArrow(boolean controlPressed) {
+    public void rightArrow(boolean controlPressed, boolean shiftPressed) {
+        int startPointer = pointer == -1 ? typedText.length() : pointer;
         if (controlPressed) {
-            if(pointer == -1) {
+            if (pointer == -1) {
                 pointer = this.typedText.length();
             } else {
-                if (pointer < this.typedText.length()) pointer += this.typedText.substring(pointer + 1).concat(/*concat a " " to guarantee space*/" ").indexOf(' ') + 1;
+                if (pointer < this.typedText.length())
+                    pointer += this.typedText.substring(pointer + 1).concat(/*concat a " " to guarantee space*/" ").indexOf(' ') + 1;
                 if (pointer > this.typedText.length()) pointer = this.typedText.length();
             }
         } else {
-            if(pointer == -1) {
+            if (pointer == -1) {
                 pointer = this.typedText.length();
             } else {
                 if (pointer < this.typedText.length()) pointer++;
@@ -164,6 +293,12 @@ public class StringInputHandler {
         }
 
         if (this.pointer == this.typedText.length()) this.pointer = -1;
+
+        if (shiftPressed) {
+            pointerWidth -= pointer - startPointer;
+        } else {
+            pointerWidth = 0;
+        }
     }
 
     public void enter(ElementRenderingContext context) {
@@ -173,5 +308,35 @@ public class StringInputHandler {
     public void reset() {
         this.pointer = -1;
         this.pointerWidth = 0;
+    }
+
+    public void renderSelection(ElementRenderingContext context) {
+        if (pointerWidth == 0) return;
+        int pointer = this.pointer == -1 ? typedText.length() : this.pointer;
+        int start, end;
+        if (pointer == typedText.length()) {
+            start = pointer - pointerWidth;
+            end = pointer;
+        } else {
+            start = pointer;
+            end = pointer + pointerWidth;
+        }
+
+        if (pointerWidth < 0) {
+            start = pointer + pointerWidth;
+            end = pointer;
+        }
+        start = Math.max(0, start);
+        end = Math.min(typedText.length(), end);
+
+        String starte = typedText.substring(0, start);
+
+        int displayTextPosStart = context.width(starte);
+        int displayTextPosEnd = context.width(typedText.substring(
+                start,
+                end
+        )) - (start > displayedText.length() ? context.width(displayedText) : 0);
+
+        context.fill(displayTextPosStart, 0, displayTextPosEnd, 10, -1);
     }
 }

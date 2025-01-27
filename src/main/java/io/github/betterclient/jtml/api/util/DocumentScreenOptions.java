@@ -1,4 +1,4 @@
-package io.github.betterclient.jtml.api;
+package io.github.betterclient.jtml.api.util;
 
 import io.github.betterclient.jtml.api.elements.HTMLDocument;
 

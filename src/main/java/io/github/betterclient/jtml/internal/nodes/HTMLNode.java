@@ -45,18 +45,24 @@ public abstract class HTMLNode<T extends Node> {
         if (parent != null) {
             this.parent0 = parent;
             this.parent = parent0.instance;
-            this.style = new CSSStyle(this.parent0.style);
+            this.style = new CSSStyle(this.parent0.style, this);
         } else {
             this.parent0 = null;
             this.parent = null;
-            this.style = new CSSStyle(null);
+            this.style = new CSSStyle(null, this);
         }
 
-        HTMLNode<?> node = this;
-        while(node.parent0 != null) {
-            node = node.parent0;
+        if (this instanceof HTMLDocument doc) {
+            this.document = doc;
+        } else {
+            HTMLNode<?> node = this;
+            while(node.parent0 != null) {
+                node = node.parent0;
+            }
+            assert node instanceof HTMLDocument;
+            this.document = (HTMLDocument) node;
         }
-        this.document = (HTMLDocument) node;
+
         this.parser = new StyleParser(this.document, style);
 
         reload();

@@ -15,78 +15,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class ElementParser {
-    private static final Map<String, Function<Pair<HTMLElement, Element>, HTMLElement>> ELEMENT_MAP = new HashMap<>(
-            Map.ofEntries(
-                    Map.entry(
-                            "span",
-                            pair -> new HTMLSpanElement(pair.left(), pair.right())
-                    ),
-                    Map.entry(
-                            "br",
-                            pair -> new HTMLBrElement(pair.left(), pair.right())
-                    ),
-                    Map.entry(
-                            "button",
-                            pair -> new HTMLButtonElement(pair.left(), pair.right())
-                    ),
-                    Map.entry(
-                            "div",
-                            pair -> new HTMLDivElement(pair.left(), pair.right())
-                    ),
-                    Map.entry(
-                            "label",
-                            pair -> new HTMLLabelElement(pair.left(), pair.right())
-                    ),
-                    Map.entry(
-                            "input",
-                            pair -> new HTMLInputElement(pair.left(), pair.right())
-                    ),
-                    Map.entry(
-                            "textarea",
-                            pair -> new HTMLTextAreaElement(pair.left(), pair.right())
-                    ),
-
-                    //-----HEADERS-----
-                    Map.entry(
-                            "h1",
-                            pair -> new HTMLHeaderElement(pair.left(), pair.right())
-                    ),
-                    Map.entry(
-                            "h2",
-                            pair -> new HTMLHeaderElement(pair.left(), pair.right())
-                    ),
-                    Map.entry(
-                            "h3",
-                            pair -> new HTMLHeaderElement(pair.left(), pair.right())
-                    ),
-                    Map.entry(
-                            "h4",
-                            pair -> new HTMLHeaderElement(pair.left(), pair.right())
-                    ),
-                    Map.entry(
-                            "h5",
-                            pair -> new HTMLHeaderElement(pair.left(), pair.right())
-                    ),
-                    Map.entry(
-                            "h6",
-                            pair -> new HTMLHeaderElement(pair.left(), pair.right())
-                    ),
-
-                    Map.entry(
-                            "style",
-                            pair -> null //Handle later
-                    )
-            )
-    );
-
-    private static final Map<String, Function<Pair<HTMLElement, Node>, HTMLNode<?>>> NODE_MAP = new HashMap<>(
-            Map.ofEntries(
-                    Map.entry(
-                            "#text",
-                            pair -> new HTMLTextNode((TextNode) pair.right(), pair.left())
-                    )
-            )
-    );
+    private static final Map<String, Function<Pair<HTMLElement, Element>, HTMLElement>> ELEMENT_MAP = getElementMap();
+    private static final Map<String, Function<Pair<HTMLElement, Node>, HTMLNode<?>>> NODE_MAP = getNodeMap();
 
     public static List<HTMLNode<?>> parse(HTMLElement element) {
         List<HTMLNode<?>> nodes = new ArrayList<>();
@@ -140,5 +70,46 @@ public class ElementParser {
                     }
             ).apply(Pair.of(parent, node)));
         }
+    }
+
+    private static Map<String, Function<Pair<HTMLElement, Node>, HTMLNode<?>>> getNodeMap() {
+        HashMap<String, Function<Pair<HTMLElement, Node>, HTMLNode<?>>> map = new HashMap<>();
+
+        map.put("#text", pair -> new HTMLTextNode((TextNode) pair.right(), pair.left()));
+
+        return map;
+    }
+
+    private static Map<String, Function<Pair<HTMLElement, Element>, HTMLElement>> getElementMap() {
+        Map<String, Function<Pair<HTMLElement, Element>, HTMLElement>> map = new HashMap<>();
+
+        //-----IGNORE-----
+        map.put("style", pair -> null);
+
+        //-----HEADER-----
+        for (int i = 1; i < 7; i++) {
+            map.put("h" + i, pair -> new HTMLHeaderElement(pair.left(), pair.right()));
+        }
+
+        //-----ELEMENTS-----
+        map.put("span", pair -> new HTMLSpanElement(pair.left(), pair.right()));
+        map.put("br", pair -> new HTMLBrElement(pair.left(), pair.right()));
+
+        //-----INPUT-----
+        map.put("button", pair -> new HTMLButtonElement(pair.left(), pair.right()));
+        map.put("label", pair -> new HTMLLabelElement(pair.left(), pair.right()));
+        map.put("input", pair -> new HTMLInputElement(pair.left(), pair.right()));
+        map.put("textarea", pair -> new HTMLTextAreaElement(pair.left(), pair.right()));
+
+        //-----BOX-----
+        map.put("div", pair -> new HTMLDivElement(pair.left(), pair.right()));
+        map.put("canvas", pair -> new HTMLCanvasElement(pair.left(), pair.right()));
+
+        //-----TEXT-----
+        map.put("a", pair -> new HTMLAElement(pair.left(), pair.right()));
+        map.put("b", pair -> new HTMLBElement(pair.left(), pair.right()));
+        map.put("i", pair -> new HTMLIElement(pair.left(), pair.right()));
+
+        return map;
     }
 }

@@ -1,6 +1,6 @@
 package io.github.betterclient.jtml.internal.elements;
 
-import io.github.betterclient.jtml.api.DocumentScreenOptions;
+import io.github.betterclient.jtml.api.util.DocumentScreenOptions;
 import io.github.betterclient.jtml.internal.css.CSSStyle;
 import io.github.betterclient.jtml.internal.css.compiler.CompiledStyleSheet;
 import io.github.betterclient.jtml.internal.css.compiler.StyleSheetCompiler;
@@ -18,10 +18,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class HTMLDocument extends HTMLElement {
     public JTMLService service;
+    public io.github.betterclient.jtml.api.elements.HTMLDocument api;
     List<Map<String, CompiledStyleSheet>> styleSheets = new ArrayList<>();
 
     public HTMLNode<?> focusedNode = null;
@@ -35,6 +35,26 @@ public class HTMLDocument extends HTMLElement {
 
         this.loadStyleElements();
         this.recursiveReload(this);
+    }
+
+    public void setApi(io.github.betterclient.jtml.api.elements.HTMLDocument api) {
+        this.api = api;
+
+        //https://github.com/jhy/jsoup/issues/2265
+        //broken
+        String onload = this.instance.attr("onload");
+        if (!onload.isEmpty()) {
+            try {
+                String methodName = onload.substring(onload.lastIndexOf('.'), onload.length() - 2);
+                String className = onload.substring(onload.lastIndexOf('.') - 1);
+
+                Class.forName(className).getMethod(methodName, io.github.betterclient.jtml.api.elements.HTMLDocument.class).invoke(
+                        null, api
+                );
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public void recursiveReload(HTMLNode<?> n) {
@@ -84,7 +104,7 @@ public class HTMLDocument extends HTMLElement {
         }
 
         //Apply padding & margins
-        DisplayMode.applyMargins(node);
+        DisplayMode.applyPadding(node);
 
         DisplayMode mode = DisplayMode.get(node.style);
         mode.loadPositions(node, new ElementRenderingContext(this.service.getFontService()));
@@ -168,5 +188,8 @@ public class HTMLDocument extends HTMLElement {
 
         element.x += mx;
         element.y += my;
+
+        //apply margin
+        DisplayMode.applyMargin(element);
     }
 }

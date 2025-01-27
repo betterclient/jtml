@@ -52,15 +52,18 @@ public class ColorParser {
     }
 
     private static Color parseHexColor(String hex) {
+        int r = Integer.parseInt(String.valueOf(hex.charAt(1)) + hex.charAt(1), 16);
+        int g = Integer.parseInt(String.valueOf(hex.charAt(2)) + hex.charAt(2), 16);
+        int b = Integer.parseInt(String.valueOf(hex.charAt(3)) + hex.charAt(3), 16);
         if (hex.length() == 4) { // #RGB
-            int r = Integer.parseInt(String.valueOf(hex.charAt(1)) + hex.charAt(1), 16);
-            int g = Integer.parseInt(String.valueOf(hex.charAt(2)) + hex.charAt(2), 16);
-            int b = Integer.parseInt(String.valueOf(hex.charAt(3)) + hex.charAt(3), 16);
             return new Color(r, g, b);
+        } else if (hex.length() == 5) { //RGBA
+            int a = Integer.parseInt(String.valueOf(hex.charAt(4)) + hex.charAt(4), 16);
+            return new Color(r, g, b, a);
         } else if (hex.length() == 7) { // #RRGGB
-            int r = Integer.parseInt(hex.substring(1, 3), 16);
-            int g = Integer.parseInt(hex.substring(3, 5), 16);
-            int b = Integer.parseInt(hex.substring(5, 7), 16);
+            r = Integer.parseInt(hex.substring(1, 3), 16);
+            g = Integer.parseInt(hex.substring(3, 5), 16);
+            b = Integer.parseInt(hex.substring(5, 7), 16);
             return new Color(r, g, b);
         } else {
             throw new IllegalArgumentException("Invalid hex color format: " + hex);

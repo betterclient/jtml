@@ -1,6 +1,6 @@
 package io.github.betterclient.jtml.internal.render;
 
-import io.github.betterclient.jtml.api.DocumentScreenOptions;
+import io.github.betterclient.jtml.api.util.DocumentScreenOptions;
 import io.github.betterclient.jtml.api.event.MouseClickEvent;
 import io.github.betterclient.jtml.internal.elements.HTMLDocument;
 import io.github.betterclient.jtml.internal.nodes.FocusableElement;
@@ -10,14 +10,15 @@ import io.github.betterclient.jtml.internal.nodes.HTMLTextNode;
 import io.github.betterclient.jtml.internal.util.ElementDimensions;
 import io.github.betterclient.jtml.service.DocumentScreen;
 import io.github.betterclient.jtml.service.RenderingService;
+import io.github.betterclient.jtml.service.UtilityService;
 import org.jsoup.nodes.Node;
 
 import java.util.List;
 import java.util.Stack;
 
 public class DocumentRendererScreen implements DocumentScreen {
-    private final DocumentScreenOptions options;
-    private final HTMLDocument document;
+    public final DocumentScreenOptions options;
+    public final HTMLDocument document;
 
     public DocumentRendererScreen(HTMLDocument document, DocumentScreenOptions options) {
         this.options = options;
@@ -35,14 +36,18 @@ public class DocumentRendererScreen implements DocumentScreen {
         //I figured it out
         Stack<HTMLNode<?>> stack = new Stack<>();
         stack.push(document);
+
         while (!stack.isEmpty()) {
             HTMLNode<?> node = stack.pop();
 
             context1.x = node.getX();
             context1.y = node.getY();
+            ElementDimensions box = node.getDimensions(context1);
 
             context1.drawBackground(node);
+            context.startScissor(node.getX(), node.getY(), box.width, box.height);
             node.render(context1);
+            context.endScissor();
 
             List<HTMLNode<? extends Node>> children = node.children;
             for (int i = children.size() - 1; i >= 0; i--) {
@@ -146,13 +151,15 @@ public class DocumentRendererScreen implements DocumentScreen {
         if (document.focusedNode == null) return;
 
         if (document.focusedNode instanceof FocusableElement focusableElement) {
-            String s = this.document.service.getUtilityService().getKeyName(keyCode, scanCode);
-            if (s == null && keyCode != this.document.service.getUtilityService().getSpaceKeyCode()) {
+            UtilityService service = this.document.service.getUtilityService();
+
+            String s = service.getKeyName(keyCode, scanCode);
+            if (s == null && keyCode != service.getSpaceKeyCode()) {
                 focusableElement.keyboardDown(new ElementRenderingContext(this.document.service.getFontService()), keyCode);
             }
 
-            if (s != null && s.equals("v") && this.document.service.getUtilityService().isControlDown()) {
-                focusableElement.keyboardPress(new ElementRenderingContext(this.document.service.getFontService()), 'v');
+            if (s != null && (s.equals("v") || s.equals("z") || s.equals("x") || s.equals("c") || s.equals("a")) && service.isControlDown()) {
+                focusableElement.keyboardPress(new ElementRenderingContext(this.document.service.getFontService()), s.charAt(0));
             }
         }
     }

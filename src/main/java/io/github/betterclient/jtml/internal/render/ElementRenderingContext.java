@@ -1,6 +1,6 @@
 package io.github.betterclient.jtml.internal.render;
 
-import io.github.betterclient.jtml.api.KeyboardKey;
+import io.github.betterclient.jtml.api.event.KeyboardKey;
 import io.github.betterclient.jtml.internal.util.ElementDimensions;
 import io.github.betterclient.jtml.internal.css.styles.Border;
 import io.github.betterclient.jtml.internal.css.styles.TextDecoration;
@@ -24,6 +24,15 @@ public class ElementRenderingContext {
         //this will also make things simpler -betterclient
         //This note just exists, so you don't touch this file, this is hell please save me.
         this.currentlyRendered = child;
+
+        if (child == child.document) {
+            context.fill(0, 0, context.scrWidth(), context.scrHeight(), child.parser.getBackgroundColor());
+
+            Border border = Border.parseBorderElement(child.style);
+            border.render(this.currentlyRendered.document, context, 0, 0, context.scrWidth(), context.scrHeight());
+
+            return;
+        }
 
         ElementDimensions box = child.getDimensions(this);
         float radius = child.parser.getSize("border-radius");
@@ -55,15 +64,19 @@ public class ElementRenderingContext {
     }
 
     public int width(String text) {
-        return (int) (context.width(text) * (this.currentlyRendered.parser.getSize("font-size") / 9f));
+        TextDecoration parse = TextDecoration.parse(this.currentlyRendered.style);
+        return (int) (context.width(text, parse) * (this.currentlyRendered.parser.getSize("font-size") / 9f));
     }
 
     public ElementDimensions asDimensions(StyleParser parser, String text) {
         float fontSize = parser.getSize("font-size");
+        TextDecoration parse = TextDecoration.parse(parser.style());
 
+        float width = ((fontSize / 9f) * context.width(text, parse) + parser.getWidthOffset());
+        float height = fontSize + parser.getWidthOffset();
         return new ElementDimensions(
-                Math.round(fontSize / 9f) * context.width(text) + parser.getWidthOffset(),
-                Math.round(fontSize) + parser.getWidthOffset()
+                Math.round(width),
+                Math.round(height)
         );
     }
 
@@ -92,5 +105,15 @@ public class ElementRenderingContext {
     public void fillVerticalLine(int x, int y) {
         int ySize = (int) currentlyRendered.parser.getSize("font-size");
         context.fill(this.x + x, this.y + y - ySize, this.x + x + 2, this.y + y, -1);
+    }
+
+    public void fill(int x, int y, int width, int height, int color) {
+        context.fill(
+                this.x + x,
+                this.y + y,
+                this.x + x + width,
+                this.y + y + height,
+                color
+        );
     }
 }

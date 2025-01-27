@@ -18,15 +18,26 @@ public class InlineDisplay extends DisplayMode {
         node.y = 44;
         int x = 0;
         int y = 0;
+        int maxY = 0;
+        ElementDimensions parentDim = node.getDimensions(context);
         for (HTMLNode<? extends Node> child : node.children) {
             ElementDimensions dimensions = child.getDimensions(context);
             child.x = x;
             child.y = y;
 
+            maxY = Math.max(maxY, dimensions.height);
+
             x += dimensions.width;
             if (child.display$moveDown && dimensions.height > 0) {
-                y += dimensions.height;
+                y += maxY;
+                maxY = 0;
                 x = 0;
+            }
+
+            if (parentDim.width < x) {
+                x = 0;
+                y += maxY;
+                maxY = 0;
             }
         }
     }
