@@ -2,8 +2,8 @@ package io.github.betterclient.jtml.internal.elements;
 
 import io.github.betterclient.jtml.api.util.DocumentScreenOptions;
 import io.github.betterclient.jtml.internal.css.CSSStyle;
+import io.github.betterclient.jtml.internal.css.compiler.CSSCompiler;
 import io.github.betterclient.jtml.internal.css.compiler.CompiledStyleSheet;
-import io.github.betterclient.jtml.internal.css.compiler.StyleSheetCompiler;
 import io.github.betterclient.jtml.internal.display.DisplayMode;
 import io.github.betterclient.jtml.internal.nodes.HTMLElement;
 import io.github.betterclient.jtml.internal.nodes.HTMLNode;
@@ -123,7 +123,7 @@ public class HTMLDocument extends HTMLElement {
     }
 
     public void addStyleSheet(String src) {
-        styleSheets.add(StyleSheetCompiler.compile(src));
+        styleSheets.add(CSSCompiler.compile(src));
         this.reloadCSS();
         this.recursiveReload(this);
     }
