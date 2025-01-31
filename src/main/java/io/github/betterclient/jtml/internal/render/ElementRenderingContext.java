@@ -1,6 +1,7 @@
 package io.github.betterclient.jtml.internal.render;
 
 import io.github.betterclient.jtml.api.event.KeyboardKey;
+import io.github.betterclient.jtml.internal.css.styles.BorderRadius;
 import io.github.betterclient.jtml.internal.util.ElementDimensions;
 import io.github.betterclient.jtml.internal.css.styles.Border;
 import io.github.betterclient.jtml.internal.css.styles.TextDecoration;
@@ -17,7 +18,7 @@ public class ElementRenderingContext {
         this.context = context;
     }
 
-    public void drawBackground(HTMLNode<?> child) {
+    public ElementDimensions drawBackground(ElementDimensions dimensions0, HTMLNode<?> child) {
         //this current function - drawBackground, is called before rendering an element
         //Which 100% guarantees child is going to be rendered right after this call
         //so just set it here and remove the call requirements
@@ -31,16 +32,21 @@ public class ElementRenderingContext {
             Border border = Border.parseBorderElement(child.style);
             border.render(this.currentlyRendered.document, context, 0, 0, context.scrWidth(), context.scrHeight());
 
-            return;
+            return new ElementDimensions(context.scrWidth(), context.scrHeight());
         }
 
         ElementDimensions box = child.getDimensions(this);
-        float radius = child.parser.getSize("border-radius");
+        BorderRadius radius = BorderRadius.getBorderRadius(child.parser);
 
-        context.fillRound(child.getX(), child.getY(), child.getX() + box.width, child.getY() + box.height, child.parser.getBackgroundColor(), radius);
+        context.fillRound(child.getX(), child.getY(), child.getX() + box.width, child.getY() + box.height, child.parser.getBackgroundColor(), radius.getTopLeft(), radius.getTopRight(), radius.getBottomLeft(), radius.getBottomRight());
+
+        assert child.parent0 != null; //Child won't be null since it's not the document
+        context.startScissor(child.parent0.getX(), child.parent0.getY(), child.parent0.getX() + dimensions0.width, child.parent0.getY() + dimensions0.height + 20);
 
         Border border = Border.parseBorderElement(child.style);
         border.render(this.currentlyRendered.document, context, child.getX(), child.getY(), box.width, box.height);
+
+        return box;
     }
 
     public void renderText(String text) {
@@ -74,6 +80,7 @@ public class ElementRenderingContext {
 
         float width = ((fontSize / 9f) * context.width(text, parse) + parser.getWidthOffset());
         float height = fontSize + parser.getWidthOffset();
+
         return new ElementDimensions(
                 Math.round(width),
                 Math.round(height)

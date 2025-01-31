@@ -2,6 +2,7 @@ package io.github.betterclient.jtml.internal.render;
 
 import io.github.betterclient.jtml.api.util.DocumentScreenOptions;
 import io.github.betterclient.jtml.api.event.MouseClickEvent;
+import io.github.betterclient.jtml.internal.css.styles.TextDecoration;
 import io.github.betterclient.jtml.internal.elements.HTMLDocument;
 import io.github.betterclient.jtml.internal.nodes.FocusableElement;
 import io.github.betterclient.jtml.internal.nodes.HTMLElement;
@@ -25,6 +26,31 @@ public class DocumentRendererScreen implements DocumentScreen {
         this.document = document;
     }
 
+    public void renderDebugging(RenderingService context) {
+        Stack<HTMLNode<?>> stack = new Stack<>();
+        stack.push(document);
+        ElementRenderingContext context1 = new ElementRenderingContext(context);
+
+        int y = 10;
+        while (!stack.isEmpty()) {
+            HTMLNode<?> node = stack.pop();
+
+            if (!node.instance.toString().isEmpty() && node instanceof HTMLElement) {
+                ElementDimensions box = node.getDimensions(context1);
+                context.renderText(
+                        node.instance + ":             X: " + node.getX() + " Y: " + node.getY() + " Width: " + box.width + " Height: " + box.height,
+                        0, y, -1, 9f, new TextDecoration()
+                );
+                y += 18;
+            }
+
+            List<HTMLNode<? extends Node>> children = node.children;
+            for (int i = children.size() - 1; i >= 0; i--) {
+                stack.push(children.get(i));
+            }
+        }
+    }
+
     @Override
     public void render(RenderingService context, Runnable renderBackground, float delta, double mouseX, double mouseY) {
         if(options.renderBackground()) {
@@ -33,27 +59,23 @@ public class DocumentRendererScreen implements DocumentScreen {
 
         ElementRenderingContext context1 = new ElementRenderingContext(context);
 
-        //I figured it out
-        Stack<HTMLNode<?>> stack = new Stack<>();
-        stack.push(document);
+        this.recursiveRender(new ElementDimensions(context.scrWidth(), context.scrHeight()), context1, document);
+        //this.renderDebugging(context);
+    }
 
-        while (!stack.isEmpty()) {
-            HTMLNode<?> node = stack.pop();
+    //If I find a good way to do this without recursion
+    //I'm going to switch
+    //But the scissoring was breaking so im sorry
+    public void recursiveRender(ElementDimensions dimensions0, ElementRenderingContext context, HTMLNode<?> node) {
+        context.x = node.getX();
+        context.y = node.getY();
 
-            context1.x = node.getX();
-            context1.y = node.getY();
-            ElementDimensions box = node.getDimensions(context1);
-
-            context1.drawBackground(node);
-            context.startScissor(node.getX(), node.getY(), box.width, box.height);
-            node.render(context1);
-            context.endScissor();
-
-            List<HTMLNode<? extends Node>> children = node.children;
-            for (int i = children.size() - 1; i >= 0; i--) {
-                stack.push(children.get(i));
-            }
+        ElementDimensions dimensions = context.drawBackground(dimensions0, node);
+        node.render(context);
+        for (HTMLNode<? extends Node> child : node.children) {
+            recursiveRender(dimensions, context, child);
         }
+        context.context.endScissor();
     }
 
     @Override

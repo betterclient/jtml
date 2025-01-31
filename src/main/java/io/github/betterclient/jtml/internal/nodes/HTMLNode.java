@@ -2,6 +2,7 @@ package io.github.betterclient.jtml.internal.nodes;
 
 import io.github.betterclient.jtml.api.event.MouseClickEvent;
 import io.github.betterclient.jtml.api.event.MouseClickHandler;
+import io.github.betterclient.jtml.internal.css.styles.Padding;
 import io.github.betterclient.jtml.internal.elements.HTMLDocument;
 import io.github.betterclient.jtml.internal.util.ElementDimensions;
 import io.github.betterclient.jtml.internal.css.StyleParser;
@@ -17,6 +18,9 @@ public abstract class HTMLNode<T extends Node> {
     public List<HTMLNode<? extends Node>> children = new ArrayList<>();
     public List<MouseClickHandler> mouseDown = new ArrayList<>();
     public List<MouseClickHandler> mouseUp = new ArrayList<>();
+
+    public boolean isScrollable = false; //Used to indicate whether to create a scroll bar or not
+    public float scrollAmount = 0; //a number between 0 and 1 for scrolling
 
     public boolean display$moveDown = false; //Used to indicate a "br" element, is in a field, so it's easy to use for other elements
 
@@ -76,19 +80,25 @@ public abstract class HTMLNode<T extends Node> {
     public void render(ElementRenderingContext context) {}
 
     public ElementDimensions getDimensions(ElementRenderingContext context) {
-        int width = this.width, height = this.height;
+        int width = 0, height = 0;
 
         for (HTMLNode<? extends Node> child : this.children) {
             ElementDimensions dimensions = child.getDimensions(context);
 
-            if (width < (child.x + dimensions.width) && this.width <= 0) {
+            if (width < (child.x + dimensions.width)) {
                 width = child.x + dimensions.width;
             }
 
-            if (height < (child.y + dimensions.height) && this.height <= 0) {
+            if (height < (child.y + dimensions.height)) {
                 height = child.y + dimensions.height;
             }
         }
+
+        if (!style.calculate("width").equals("auto") && parser.getSize("width") > 0) width = (int) parser.getSize("width");
+        if (!style.calculate("height").equals("auto") && parser.getSize("height") > 0) height = (int) parser.getSize("height");
+
+        if (this.width > 0) width = this.width;
+        if (this.height > 0) height = this.height;
 
         return new ElementDimensions(width, height);
     }

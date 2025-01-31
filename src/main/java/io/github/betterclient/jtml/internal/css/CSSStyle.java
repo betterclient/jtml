@@ -41,7 +41,6 @@ public class CSSStyle {
         map.put("width", "-1");
         map.put("height", "-1");
         map.put("border", "none");
-        map.put("border-radius", "0");
 
         //-----BACKGROUND-----
         map.put("background-color", "transparent");
@@ -49,6 +48,13 @@ public class CSSStyle {
         //-----OTHER-----
         map.put("display", "inline");
         map.put("width-offset", "default");
+
+        //-----BORDER-----
+        map.put("border-radius", "0");
+        map.put("border-top-left-radius", "0");
+        map.put("border-top-right-radius", "0");
+        map.put("border-bottom-left-radius", "0");
+        map.put("border-bottom-right-radius", "0");
 
         //-----FLEX-----
         map.put("justify-content", "left");
@@ -58,8 +64,7 @@ public class CSSStyle {
         //-----GRID-----
         map.put("grid-template-columns", "none");
         map.put("grid-template-rows", "none");
-        map.put("grid-column", "auto");
-        map.put("grid-row", "auto");
+        map.put("grid-gap", "-1");
 
         //-----MARGIN-----
         map.put("margin", "0");
@@ -92,7 +97,6 @@ public class CSSStyle {
         map.put("width", "-1");
         map.put("height", "-1");
         map.put("border", "none");
-        map.put("border-radius", "0");
 
         //-----BACKGROUND-----
         map.put("background-color", "transparent");
@@ -100,6 +104,13 @@ public class CSSStyle {
         //-----OTHER-----
         map.put("display", "inline");
         map.put("width-offset", "2px");
+
+        //-----BORDER-----
+        map.put("border-radius", "0");
+        map.put("border-top-left-radius", "0");
+        map.put("border-top-right-radius", "0");
+        map.put("border-bottom-left-radius", "0");
+        map.put("border-bottom-right-radius", "0");
 
         //-----FLEX-----
         map.put("justify-content", "left");

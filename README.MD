@@ -87,17 +87,20 @@ background-color: *;
 color: *;
 text-decoration: strikethrough | underline | none;
 font-weight: bold | italic | none;
-border-radius: *;
 border: 2px solid black;
+
+border-radius: 10px 10px 10px 10px | 10px;
+border-top-left-radius: 10px;
+border-top-right-radius: 10px;
+border-bottom-left-radius: 10px;
+border-bottom-right-radius: 10px;
 
 justify-content: left | center | right;
 align-items: start | center | end;
 flex-direction: column | row;
 
-grid-template-columns: *;
-grid-template-rows: *;
-grid-column: *;
-grid-row: *;
+grid-template-columns: 200px | 1fr;
+grid-gap: *;
 
 margin: *;
 margin-top: *;

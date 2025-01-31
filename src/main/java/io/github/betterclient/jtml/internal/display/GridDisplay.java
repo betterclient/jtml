@@ -2,8 +2,9 @@ package io.github.betterclient.jtml.internal.display;
 
 import io.github.betterclient.jtml.internal.nodes.HTMLNode;
 import io.github.betterclient.jtml.internal.render.ElementRenderingContext;
+import io.github.betterclient.jtml.internal.util.ElementDimensions;
+import org.jsoup.nodes.Node;
 
-//TODO: rewrite this
 public class GridDisplay extends DisplayMode {
     static final DisplayMode INSTANCE = new GridDisplay();
 
@@ -15,85 +16,84 @@ public class GridDisplay extends DisplayMode {
     public void loadPositions(HTMLNode<?> node, ElementRenderingContext context) {
         String gridTemplateColumns = node.style.calculate("grid-template-columns");
         String gridTemplateRows = node.style.calculate("grid-template-rows");
-        String gridColumn = node.style.calculate("grid-column");
-        String gridRow = node.style.calculate("grid-row");
+        float gridGap = node.parser.getSize("grid-gap");
+        if (gridGap <= 0) gridGap = 0;
 
-        int[] columnSizes = template(gridTemplateColumns, context.screenWidth());
-        int[] rowSizes = template(gridTemplateRows, context.screenHeight());
-        int[] columnRange = placeGrid(gridColumn, columnSizes.length);
-        int[] rowRange = placeGrid(gridRow, rowSizes.length);
+        ElementDimensions box = new ElementDimensions(
+                node.width > 0 ? node.width : (context.screenWidth() - (44 * 2)),
+                node.height > 0 ? node.height : (context.screenHeight() - (44 * 2))
+        );
 
-        int x = move(columnSizes, columnRange);
-        int y = move(rowSizes, rowRange);
+        int[] rowSizes = parseTemplate(gridTemplateRows, box.height, gridGap);
+        int[] columnSizes = parseTemplate(gridTemplateColumns, box.width, gridGap);
 
-        node.x = x;
-        node.y = y;
-    }
-
-    private int[] template(String template, int totalSize) {
-        if (template == null || template.isEmpty()) {
-            throw new UnsupportedOperationException("Invalid grid template");
-        }
-
-        String[] parts = template.split("\\s+");
-        int[] sizes = new int[parts.length];
-        int remainingSize = totalSize;
-        int autoCount = 0;
-
-        for (int i = 0; i < parts.length; i++) {
-            if (parts[i].equals("auto")) {
-                sizes[i] = -1;
-                autoCount++;
-                continue;
-            } else if (parts[i].endsWith("px")) {
-                sizes[i] = Integer.parseInt(parts[i].replace("px", ""));
-            } else if (parts[i].endsWith("%")) {
-                sizes[i] = (int) (totalSize * Double.parseDouble(parts[i].replace("%", "")) / 100);
-            } else continue;
-
-            remainingSize -= sizes[i];
-        }
-
-        if (autoCount > 0 && remainingSize > 0) {
-            int autoSize = remainingSize / autoCount;
-            for (int i = 0; i < sizes.length; i++) {
-                if (sizes[i] == -1) {
-                    sizes[i] = autoSize;
-                }
+        int indexC = 0;
+        int currentX = 0;
+        int indexR = 0;
+        int currentY = 0;
+        for (HTMLNode<? extends Node> child : node.children) {
+            if (child.getDimensions(context).width == 0 && child.getDimensions(context).height == 0) {
+                continue; //ignore empty nodes...
             }
-        }
 
-        return sizes;
-    }
+            if (indexC >= columnSizes.length) {
+                indexC = 0;
+                currentX = 0;
 
-    private int[] placeGrid(String placement, int maxIndex) {
-        if (placement == null || placement.isEmpty()) {
-            return new int[] { 0, 1 };
-        }
-        String[] parts = placement.split("/");
-        int start = parsePlacementPart(parts[0].trim(), maxIndex);
-        int end = parts.length > 1 ? parsePlacementPart(parts[1].trim(), maxIndex) : start + 1;
-        return new int[] { start, end };
-    }
+                if (rowSizes[indexR] != box.height) currentY += (int) (rowSizes[indexR] + gridGap);
+                else currentY += (int) (child.getDimensions(context).height + gridGap);
 
-    private int parsePlacementPart(String part, int maxIndex) {
-        if (part.equals("auto")) {
-            return maxIndex;
-        }
+                indexR++;
+            }
 
-        try {
-            int value = Integer.parseInt(part);
-            return Math.max(0, Math.min(value - 1, maxIndex));
-        } catch (NumberFormatException e) {
-            throw new UnsupportedOperationException("Invalid grid placement value: " + part);
+            if (indexR >= rowSizes.length) {
+                indexR = 0;
+            }
+
+            child.x = currentX;
+            child.y = currentY;
+
+            child.width = columnSizes[indexC];
+            if (rowSizes[indexR] != box.height) child.height = rowSizes[indexR];
+
+            currentX += (int) (columnSizes[indexC] + gridGap);
+            indexC++;
         }
     }
 
-    private int move(int[] sizes, int[] range) {
-        int position = 0;
-        for (int i = 0; i < range[0]; i++) {
-            position += sizes[i];
+    private int[] parseTemplate(String gridTemplate, int max, float gridGap) {
+        if (gridTemplate.equals("none")) return new int[] {max};
+
+        String[] split = gridTemplate.split(" ");
+        int remaining = max;
+        int[] arr = new int[split.length];
+        int index = 0;
+        int totalFRS = 0;
+        for (String s : split) {
+            if (s.endsWith("fr")) {
+                s = s.replace("fr", "");
+                arr[index] = max * Integer.parseInt(s);
+                totalFRS += Integer.parseInt(s);
+            } else {
+                s = s.replace("px", "");
+                arr[index] = Integer.parseInt(s);
+                remaining -= (int) (arr[index] + gridGap);
+            }
+
+            index++;
         }
-        return position;
+
+        index = 0;
+        for (int i : arr) {
+            if (i >= max) {
+                int wantedSize = i / max;
+                arr[index] = (remaining / totalFRS) * wantedSize;
+                remaining -= (int) gridGap;
+            }
+
+            index++;
+        }
+
+        return arr;
     }
 }

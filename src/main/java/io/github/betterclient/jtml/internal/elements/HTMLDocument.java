@@ -31,7 +31,7 @@ public class HTMLDocument extends HTMLElement {
             if (htmlNode instanceof HTMLDocument doc) {
                 doc.service = service0;
             }
-        }, null, Jsoup.parseBodyFragment(src).body());
+        }, null, Jsoup.parse(src).body());
 
         this.loadStyleElements();
         this.recursiveReload(this);
@@ -40,13 +40,11 @@ public class HTMLDocument extends HTMLElement {
     public void setApi(io.github.betterclient.jtml.api.elements.HTMLDocument api) {
         this.api = api;
 
-        //https://github.com/jhy/jsoup/issues/2265
-        //broken
         String onload = this.instance.attr("onload");
         if (!onload.isEmpty()) {
             try {
-                String methodName = onload.substring(onload.lastIndexOf('.'), onload.length() - 2);
-                String className = onload.substring(onload.lastIndexOf('.') - 1);
+                String methodName = onload.substring(onload.lastIndexOf('.') + 1, onload.length() - 2);
+                String className = onload.substring(0, onload.lastIndexOf('.'));
 
                 Class.forName(className).getMethod(methodName, io.github.betterclient.jtml.api.elements.HTMLDocument.class).invoke(
                         null, api
@@ -103,7 +101,7 @@ public class HTMLDocument extends HTMLElement {
             node.height = (int) node.parser.getSize("height");
         }
 
-        //Apply padding & margins
+        //Apply padding
         DisplayMode.applyPadding(node);
 
         DisplayMode mode = DisplayMode.get(node.style);

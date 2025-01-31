@@ -56,9 +56,8 @@ public class HTMLDocument extends HTMLElement<io.github.betterclient.jtml.intern
             base = "";
         }
 
-        internal.setApi(this);
-
         cacheInternals(this);
+        internal.setApi(this);
     }
 
     private void cacheInternals(HTMLElement<?> element) {

@@ -51,6 +51,20 @@ public interface RenderingService {
     void fillRound(float x, float y, float endX, float endY, int color, float radius);
 
     /**
+     * Fill a rounded rectangle
+     * @param x left
+     * @param y top
+     * @param endX right
+     * @param endY bottom
+     * @param color color (RGBA)
+     * @param topLeft top left radius
+     * @param topRight top right radius
+     * @param bottomLeft bottom left radius
+     * @param bottomRight bottom right radius
+     */
+    void fillRound(float x, float y, float endX, float endY, int color, float topLeft, float topRight, float bottomLeft, float bottomRight);
+
+    /**
      * Return the corresponding key
      * <br>
      * Don't throw exceptions from this.
@@ -88,10 +102,10 @@ public interface RenderingService {
      * Start scissoring rendered stuff
      * @param x left
      * @param y top
-     * @param width width
-     * @param height height
+     * @param endX right
+     * @param endY bottom
      */
-    void startScissor(int x, int y, int width, int height);
+    void startScissor(int x, int y, int endX, int endY);
 
     /**
      * End scissoring
